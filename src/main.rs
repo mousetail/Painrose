@@ -28,11 +28,13 @@ enum Tile {
     E,
 }
 
+#[derive(Debug)]
 enum EdgeDefinitionType {
     Inside(Tile, AbsoluteDirection),
     Outside(AbsoluteDirection),
 }
 
+#[derive(Debug)]
 struct OutgoingEdgeDefinition {
     edge_type: EdgeDefinitionType,
     direction: Vec<RelativeDirection>,
@@ -298,6 +300,7 @@ impl TileReference {
         let mut index = 0;
 
         loop {
+            println!("{index:?} {copy:?} {definition:?}");
             match definition.edge_type {
                 EdgeDefinitionType::Inside(tile, direction) => {
                     copy.set_at(index, tile);
@@ -324,5 +327,11 @@ const TILE_PATTERN: [Tile; 5] = [Tile::A, Tile::B, Tile::D, Tile::E, Tile::C];
 fn main() {
     let reference = TileReference(vec![]);
 
-    println!("{:?}", reference.go(AbsoluteDirection::East));
+    println!(
+        "{:?}",
+        reference
+            .go(AbsoluteDirection::West)
+            .0
+            .go(AbsoluteDirection::South)
+    );
 }
