@@ -337,5 +337,3 @@ impl TileReference {
 }
 
 const TILE_PATTERN: [Tile; 6] = [Tile::C, Tile::E, Tile::D, Tile::B, Tile::A, Tile::A];
-
-fn main() {}
