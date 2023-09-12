@@ -40,7 +40,7 @@ Note: All directions are relative and will push you in a different direction dep
 
 * `"` Start/End a string, pushed as seperate character values
 * `'` Start/End a string, pushed as a single array
-* `\`` Push a single character
+* <code>`</code> Push a single character
 
 ### Pushing Constants
 
@@ -53,7 +53,7 @@ Note: All directions are relative and will push you in a different direction dep
 
 * `+-*/` Basic arithmetic. On arrays does concat, difference, product, 
 * `!` Power
-* `sc` Since, Cosine
+* `sc` Sine, Cosine
 * `g` Natural Logarithm
 * `_` Negate
 
