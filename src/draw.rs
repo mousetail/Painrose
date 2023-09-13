@@ -38,6 +38,8 @@ fn draw(coordinate: &TileReference) -> Vec<(f32, f32)> {
             angle -= default_angle;
         }
 
+        println!("{position:?} {angle:?}");
+
         matrix = Mat4::from_translation(position)
             * Mat4::from_quat(Quat::from_rotation_z(angle))
             * matrix;
@@ -47,8 +49,8 @@ fn draw(coordinate: &TileReference) -> Vec<(f32, f32)> {
         Tile::A | Tile::C | Tile::E => vec![
             Vec3::new(-1.0, -1.0, 0.0),
             Vec3::new(-1.0, 1.0, 0.0),
-            Vec3::new(1.0, -1.0, 0.0),
             Vec3::new(1.0, 1.0, 0.0),
+            Vec3::new(1.0, -1.0, 0.0),
         ],
         Tile::D | Tile::B => vec![
             Vec3::new(-1.0, -1.5, 0.0),
@@ -60,7 +62,7 @@ fn draw(coordinate: &TileReference) -> Vec<(f32, f32)> {
 
     return coordinates
         .into_iter()
-        .map(|i| matrix.transform_vector3(i))
+        .map(|i| matrix.transform_point3(i))
         .map(|i| (i.x, i.y))
         .collect();
 }
