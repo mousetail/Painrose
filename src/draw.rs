@@ -62,7 +62,7 @@ pub fn draw_svg(coords: Vec<TileReference>) {
     file.write_all(b"<svg version=\"1.1\" height=\"512\" width=\"512\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-4 -4 8 8\">\n").unwrap();
 
     for (index, coord) in coords.into_iter().enumerate() {
-        for j in [2] {
+        for j in [0, 1, 2, 3, 4] {
             writeln!(
                 file,
                 "<path fill=\"none\" stroke=\"{}\" stroke-width=\"0.025\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
@@ -76,13 +76,7 @@ pub fn draw_svg(coords: Vec<TileReference>) {
         }
     }
 
-    writeln!(
-        file,
-        "<circle cx=\"{}\" cy=\"{}\" r=\"0.05\"/>",
-        shape_info.thick_rhomb.width / 2.0,
-        shape_info.thick_rhomb.height / 2.0
-    )
-    .unwrap();
+    writeln!(file, "<circle cx=\"{}\" cy=\"{}\" r=\"0.05\"/>", 0.0, 0.0).unwrap();
 
     file.write_all(b"</svg>").unwrap();
 }
@@ -93,13 +87,12 @@ fn draw(coordinate: &TileReference, offset: usize, shape_info: AllShapeInfos) ->
     for index in offset..coordinate.0.len().max(MIN_ITERATIONS) {
         matrix = get_matrix(coordinate, index, shape_info) * matrix;
     }
-    println!("{matrix:?}");
 
-    for i in (0..coordinate.0.len().max(MIN_ITERATIONS)).rev() {
+    for i in (0..coordinate.0.len().max(MIN_ITERATIONS).max(offset)).rev() {
         matrix = get_matrix(&reference, i, shape_info).inverse() * matrix;
     }
 
-    let rhomb = match coordinate.get_at(0) {
+    let rhomb = match coordinate.get_at(offset) {
         Tile::A | Tile::C | Tile::E => shape_info.thick_rhomb,
         Tile::D | Tile::B => shape_info.thin_rhomb,
     };

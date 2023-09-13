@@ -285,6 +285,16 @@ pub fn get_external_edge_definition(
 pub struct TileReference(pub Vec<Tile>);
 
 impl TileReference {
+    fn new(tiles: Vec<Tile>) -> TileReference {
+        let mut instance = TileReference(Vec::with_capacity(tiles.len()));
+
+        for (index, item) in tiles.into_iter().enumerate() {
+            instance.set_at(index, item);
+        }
+
+        instance
+    }
+
     pub fn get_at(&self, index: usize) -> Tile {
         if index < self.0.len() {
             return self.0[index];
