@@ -1,20 +1,45 @@
 mod draw;
 mod penrose;
 
+fn create_ribbon(
+    start_point: penrose::TileReference,
+    direction: penrose::AbsoluteDirection,
+    length: usize,
+) -> Vec<penrose::TileReference> {
+    let mut tiles = vec![start_point];
+    let mut direction = direction;
+    for _ in 0..100 {
+        let (new_tile, new_direction) = tiles.last().unwrap().go(direction);
+        println!("{new_tile:?} {:?}", new_direction.invert());
+        tiles.push(new_tile);
+        direction = new_direction.invert();
+    }
+
+    tiles
+}
 fn main() {
-    draw::draw_svg(vec![
-        penrose::TileReference::new(vec![penrose::Tile::A]),
-        penrose::TileReference::new(vec![penrose::Tile::B]),
+    // tiles.remove(1);
+    // tiles.remove(1);
+    let mut tiles = vec![];
+    tiles.extend(create_ribbon(
         penrose::TileReference::new(vec![]),
-        penrose::TileReference::new(vec![penrose::Tile::D, penrose::Tile::D]),
-        penrose::TileReference::new(vec![penrose::Tile::E, penrose::Tile::D]),
-        penrose::TileReference::new(vec![penrose::Tile::A, penrose::Tile::A, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::B, penrose::Tile::A, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::C, penrose::Tile::A, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::A, penrose::Tile::C, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::B, penrose::Tile::C, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::C, penrose::Tile::C, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::D, penrose::Tile::B, penrose::Tile::E]),
-        penrose::TileReference::new(vec![penrose::Tile::E, penrose::Tile::B, penrose::Tile::E]),
-    ])
+        penrose::AbsoluteDirection::North,
+        20,
+    ));
+    tiles.extend(create_ribbon(
+        penrose::TileReference::new(vec![])
+            .go(penrose::AbsoluteDirection::East)
+            .0,
+        penrose::AbsoluteDirection::East,
+        20,
+    ));
+    tiles.extend(create_ribbon(
+        penrose::TileReference::new(vec![])
+            .go(penrose::AbsoluteDirection::West)
+            .0,
+        penrose::AbsoluteDirection::East,
+        20,
+    ));
+
+    draw::draw_svg(tiles);
 }

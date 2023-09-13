@@ -26,6 +26,7 @@ pub fn test_if_all_relations_are_symetric() {
                     let new_tile_type = match tile {
                         Tile::A | Tile::B | Tile::C => Tile::A,
                         Tile::D | Tile::E => Tile::B,
+                        _ => panic!("Invalid tile"),
                     };
 
                     assert_eq!(

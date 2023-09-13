@@ -50,26 +50,36 @@ impl AllShapeInfos {
 
 const MIN_ITERATIONS: usize = 0;
 
+#[allow(unused)]
 pub fn draw_svg(coords: Vec<TileReference>) {
-    let colors = [
-        "red", "green", "blue", "cyan", "magenta", "orange", "purple", "grey",
-    ];
+    let colors = ["red", "green", "blue", "cyan", "magenta", "#888800"];
+    let get_colors = |tile: Tile| match tile {
+        Tile::A => "red",
+        Tile::B => "green",
+        Tile::C => "blue",
+        Tile::D => "magenta",
+        Tile::E => "orange",
+        Tile::Unset => panic!("Invalid tile"),
+    };
+
     let shape_info = AllShapeInfos::new();
     println!("{shape_info:?}");
 
     let mut file = std::fs::File::create("Tiles.svg").unwrap();
 
-    file.write_all(b"<svg version=\"1.1\" height=\"512\" width=\"512\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-4 -4 8 8\">\n").unwrap();
+    file.write_all(b"<svg version=\"1.1\" height=\"1024\" width=\"1024\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-12 -12 24 24\">\n").unwrap();
 
-    for (index, coord) in coords.into_iter().enumerate() {
+    for (_index, coord) in coords.into_iter().enumerate() {
         for j in [0] {
+            //}, 1, 2, 3, 4, 5] {
             writeln!(
                 file,
-                "<path fill=\"none\" stroke=\"{}\" stroke-width=\"0.025\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
-                if j==0{colors[index%colors.len()]} else { ["#00000044", "#22882244"][index % 2] },
+                "<path fill=\"none\" stroke=\"{}\" stroke-width=\"{}\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
+                get_colors(coord.get_at(j)),
+                if j==0 { 0.025 } else {0.0128},
                 &draw(&coord, j, shape_info)
                     .into_iter()
-                    .map(|c| format!("L {} {} ", c.0 , c.1 ))
+                    .map(|c| format!("L {} {} ", c.0 , -c.1 ))
                     .collect::<String>()[1..]
             )
             .unwrap();
@@ -95,6 +105,7 @@ fn draw(coordinate: &TileReference, offset: usize, shape_info: AllShapeInfos) ->
     let rhomb = match coordinate.get_at(offset) {
         Tile::A | Tile::C | Tile::E => shape_info.thick_rhomb,
         Tile::D | Tile::B => shape_info.thin_rhomb,
+        _ => panic!("All tiles should be set"),
     };
 
     let coordinates = vec![
@@ -148,11 +159,11 @@ fn get_offset_and_rotation(tile: Tile, shape_info: AllShapeInfos) -> (Vec3, f32)
         ),
         Tile::C => (
             Vec3::new(
-                shape_info.thick_rhomb.width / 4.0,
+                -shape_info.thick_rhomb.width / 4.0,
                 -shape_info.thick_rhomb.height / 4.0,
                 0.0,
             ),
-            -shape_info.thick_rhomb.bottom_angle / 2.0 + consts::PI,
+            shape_info.thick_rhomb.bottom_angle / 2.0 - consts::PI,
         ),
         Tile::D => {
             let scaling_factor = shape_info.thin_rhomb.height / 2.0;

@@ -22,7 +22,7 @@ pub enum AbsoluteDirection {
 }
 
 impl AbsoluteDirection {
-    fn invert(self) -> Self {
+    pub fn invert(self) -> Self {
         match self {
             AbsoluteDirection::North => AbsoluteDirection::South,
             AbsoluteDirection::East => AbsoluteDirection::West,
@@ -39,6 +39,7 @@ pub enum Tile {
     C,
     D,
     E,
+    Unset,
 }
 
 #[derive(Debug, PartialEq)]
@@ -91,8 +92,8 @@ pub fn get_internal_edge_definition(
                 direction: vec![RelativeDirection::Right, RelativeDirection::Right],
             },
             AbsoluteDirection::West => OutgoingEdgeDefinition {
-                edge_type: EdgeDefinitionType::Inside(Tile::C, AbsoluteDirection::South),
-                direction: vec![],
+                edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::South),
+                direction: vec![RelativeDirection::Left],
             },
         },
         Tile::C => match direction {
@@ -105,12 +106,12 @@ pub fn get_internal_edge_definition(
                 direction: vec![RelativeDirection::Left],
             },
             AbsoluteDirection::South => OutgoingEdgeDefinition {
-                edge_type: EdgeDefinitionType::Inside(Tile::B, AbsoluteDirection::West),
-                direction: vec![],
+                edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::West),
+                direction: vec![RelativeDirection::Right],
             },
             AbsoluteDirection::West => OutgoingEdgeDefinition {
-                edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::South),
-                direction: vec![RelativeDirection::Left],
+                edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::North),
+                direction: vec![RelativeDirection::Left, RelativeDirection::Left],
             },
         },
         Tile::D => match direction {
@@ -164,8 +165,8 @@ pub fn get_external_edge_definition(
             // North
             (AbsoluteDirection::North, [RelativeDirection::Left, RelativeDirection::Left]) => {
                 OutgoingEdgeDefinition {
-                    edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::West),
-                    direction: vec![RelativeDirection::Right],
+                    edge_type: EdgeDefinitionType::Inside(Tile::C, AbsoluteDirection::West),
+                    direction: vec![],
                 }
             }
             (AbsoluteDirection::North, [RelativeDirection::Left, RelativeDirection::Right]) => {
@@ -197,7 +198,7 @@ pub fn get_external_edge_definition(
             }
             // South
             (AbsoluteDirection::South, [RelativeDirection::Left]) => OutgoingEdgeDefinition {
-                edge_type: EdgeDefinitionType::Inside(Tile::C, AbsoluteDirection::West),
+                edge_type: EdgeDefinitionType::Inside(Tile::B, AbsoluteDirection::West),
                 direction: vec![],
             },
             (AbsoluteDirection::South, [RelativeDirection::Right]) => OutgoingEdgeDefinition {
@@ -210,8 +211,8 @@ pub fn get_external_edge_definition(
                 direction: vec![],
             },
             (AbsoluteDirection::West, [RelativeDirection::Right]) => OutgoingEdgeDefinition {
-                edge_type: EdgeDefinitionType::Outside(AbsoluteDirection::North),
-                direction: vec![RelativeDirection::Left, RelativeDirection::Left],
+                edge_type: EdgeDefinitionType::Inside(Tile::C, AbsoluteDirection::South),
+                direction: vec![],
             },
             _ => {
                 panic!("Bad Input for direction {direction:?} and side {side:?} and tile {tile:?}")
@@ -312,7 +313,9 @@ impl TileReference {
     fn assert_tiles_sensical(inner_tile: Tile, outer_tile: Tile) {
         match (inner_tile, outer_tile) {
             (Tile::A | Tile::B | Tile::C, Tile::A | Tile::C | Tile::E)
-            | (Tile::D | Tile::E, Tile::B | Tile::D) => (),
+            | (Tile::D | Tile::E, Tile::B | Tile::D)
+            | (Tile::Unset, _)
+            | (_, Tile::Unset) => (),
             (previous_tile, next_tile) => {
                 panic!("The tile {previous_tile:?} can not appear inside {next_tile:?}")
             }
@@ -359,6 +362,8 @@ impl TileReference {
                     }
                 }
                 EdgeDefinitionType::Outside(direction) => {
+                    copy.set_at(index, Tile::Unset);
+
                     sides.push(definition.direction.iter().map(|i| i.invert()).collect());
                     index += 1;
                     definition = get_internal_edge_definition(copy.get_at(index), direction)
