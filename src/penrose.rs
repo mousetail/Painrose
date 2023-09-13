@@ -282,17 +282,24 @@ pub fn get_external_edge_definition(
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct TileReference(pub Vec<Tile>);
+pub struct TileReference(Vec<Tile>);
 
 impl TileReference {
-    fn new(tiles: Vec<Tile>) -> TileReference {
-        let mut instance = TileReference(Vec::with_capacity(tiles.len()));
-
-        for (index, item) in tiles.into_iter().enumerate() {
-            instance.set_at(index, item);
+    pub fn new(tiles: Vec<Tile>) -> TileReference {
+        for i in 0..tiles.len() {
+            Self::assert_tiles_sensical(
+                tiles[i],
+                *tiles
+                    .get(i + 1)
+                    .unwrap_or(&TILE_PATTERN[(i + 1) % TILE_PATTERN.len()]),
+            )
         }
 
-        instance
+        return TileReference(tiles);
+    }
+
+    pub fn len(&self) -> usize {
+        return self.0.len();
     }
 
     pub fn get_at(&self, index: usize) -> Tile {
@@ -302,7 +309,22 @@ impl TileReference {
         return TILE_PATTERN[index % TILE_PATTERN.len()];
     }
 
+    fn assert_tiles_sensical(inner_tile: Tile, outer_tile: Tile) {
+        match (inner_tile, outer_tile) {
+            (Tile::A | Tile::B | Tile::C, Tile::A | Tile::C | Tile::E)
+            | (Tile::D | Tile::E, Tile::B | Tile::D) => (),
+            (previous_tile, next_tile) => {
+                panic!("The tile {previous_tile:?} can not appear inside {next_tile:?}")
+            }
+        }
+    }
+
     pub fn set_at(&mut self, index: usize, tile: Tile) {
+        if index > 0 {
+            Self::assert_tiles_sensical(self.get_at(index - 1), tile);
+        }
+        Self::assert_tiles_sensical(tile, self.get_at(index + 1));
+
         while index >= self.0.len() {
             self.0.push(TILE_PATTERN[self.0.len() % TILE_PATTERN.len()]);
         }

@@ -49,11 +49,11 @@ pub fn test_if_all_relations_are_symetric() {
 #[test]
 fn test_if_graph_is_symetric() {
     for tile_graph in [
-        TileReference(vec![Tile::A]),
-        TileReference(vec![Tile::B]),
-        TileReference(vec![]),
-        TileReference(vec![Tile::D, Tile::D]),
-        TileReference(vec![Tile::E, Tile::D]),
+        TileReference::new(vec![Tile::A]),
+        TileReference::new(vec![Tile::B]),
+        TileReference::new(vec![]),
+        TileReference::new(vec![Tile::D, Tile::D]),
+        TileReference::new(vec![Tile::E, Tile::D]),
     ]
     .iter()
     {

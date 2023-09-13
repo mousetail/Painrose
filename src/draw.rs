@@ -62,7 +62,7 @@ pub fn draw_svg(coords: Vec<TileReference>) {
     file.write_all(b"<svg version=\"1.1\" height=\"512\" width=\"512\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"-4 -4 8 8\">\n").unwrap();
 
     for (index, coord) in coords.into_iter().enumerate() {
-        for j in [0, 1, 2, 3, 4] {
+        for j in [0] {
             writeln!(
                 file,
                 "<path fill=\"none\" stroke=\"{}\" stroke-width=\"0.025\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
@@ -83,12 +83,12 @@ pub fn draw_svg(coords: Vec<TileReference>) {
 
 fn draw(coordinate: &TileReference, offset: usize, shape_info: AllShapeInfos) -> Vec<(f32, f32)> {
     let mut matrix = glam::f32::Mat4::IDENTITY;
-    let reference = TileReference(vec![]);
-    for index in offset..coordinate.0.len().max(MIN_ITERATIONS) {
+    let reference = TileReference::new(vec![]);
+    for index in offset..coordinate.len().max(MIN_ITERATIONS) {
         matrix = get_matrix(coordinate, index, shape_info) * matrix;
     }
 
-    for i in (0..coordinate.0.len().max(MIN_ITERATIONS).max(offset)).rev() {
+    for i in (0..coordinate.len().max(MIN_ITERATIONS).max(offset)).rev() {
         matrix = get_matrix(&reference, i, shape_info).inverse() * matrix;
     }
 
