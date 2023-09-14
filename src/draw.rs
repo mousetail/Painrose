@@ -10,7 +10,6 @@ const SCALING_FACTOR_INVERSE: f32 = 1.0 / SCALING_FACTOR;
 struct ShapeInfo {
     width: f32,
     height: f32,
-    side_length: f32,
     bottom_angle: f32,
     side_angle: f32,
 }
@@ -25,7 +24,6 @@ impl ShapeInfo {
         ShapeInfo {
             width,
             height,
-            side_length: SCALING_FACTOR_INVERSE,
             side_angle: angle_radians,
             bottom_angle: consts::PI - angle_radians,
         }
@@ -74,12 +72,12 @@ pub fn draw_svg(coords: Vec<TileReference>) {
             //}, 1, 2, 3, 4, 5] {
             writeln!(
                 file,
-                "<path fill=\"none\" stroke=\"{}\" stroke-width=\"{}\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
+                "<path fill=\"{}\" stroke-width=\"{}\" d=\"M {} Z\" alt=\"{coord:?}\"/>",
                 get_colors(coord.get_at(j)),
-                if j==0 { 0.025 } else {0.0128},
+                if j == 0 { 0.025 } else { 0.0128 },
                 &draw(&coord, j, shape_info)
                     .into_iter()
-                    .map(|c| format!("L {} {} ", c.0 , -c.1 ))
+                    .map(|c| format!("L {} {} ", c.0, -c.1))
                     .collect::<String>()[1..]
             )
             .unwrap();
@@ -109,12 +107,21 @@ fn draw(coordinate: &TileReference, offset: usize, shape_info: AllShapeInfos) ->
     };
 
     let coordinates = vec![
-        Vec3::new(0.0, rhomb.height / 2.0, 0.0),
         Vec3::new(-rhomb.width / 2.0, 0.0, 0.0),
         Vec3::new(0.0, -rhomb.height / 2.0, 0.0),
         Vec3::new(rhomb.width / 2.0, 0.0, 0.0),
+        //
+        Vec3::new(rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45, 0.0),
+        Vec3::new(0.05, 0.05, 0.0),
+        Vec3::new(0.05, 0.1, 0.0),
+        Vec3::new(rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55, 0.0),
+        //
         Vec3::new(0.0, rhomb.height / 2.0, 0.0),
-        Vec3::new(0.0, 0.0, 0.0),
+        //
+        Vec3::new(-rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55, 0.0),
+        Vec3::new(-0.05, 0.1, 0.0),
+        Vec3::new(-0.05, 0.05, 0.0),
+        Vec3::new(-rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45, 0.0),
     ];
 
     return coordinates

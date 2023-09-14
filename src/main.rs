@@ -8,7 +8,7 @@ fn create_ribbon(
 ) -> Vec<penrose::TileReference> {
     let mut tiles = vec![start_point];
     let mut direction = direction;
-    for _ in 0..100 {
+    for _ in 0..length {
         let (new_tile, new_direction) = tiles.last().unwrap().go(direction);
         println!("{new_tile:?} {:?}", new_direction.invert());
         tiles.push(new_tile);
@@ -18,8 +18,6 @@ fn create_ribbon(
     tiles
 }
 fn main() {
-    // tiles.remove(1);
-    // tiles.remove(1);
     let mut tiles = vec![];
     tiles.extend(create_ribbon(
         penrose::TileReference::new(vec![]),
