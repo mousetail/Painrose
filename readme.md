@@ -1,18 +1,29 @@
 # Penrose, an esoteric language where code is layed out in aperiodic tile patterns
 
-
-
 ## How it works
 
-There are many different algorithms to generate penrose tilings. We use a method where each shape can be divided into some number of smaller shapes, according to this diagram:
+### What even is a penrose tiling?
+
+The penrose tilings are a family of aperodic infinite tilings. That they are aperiodic means that, while some patterns appear many times, no sequence of them will repeat end to end forever.
+
+The basic shapes used in the tilings can create simple repeating patterns, but penrose tilings puts certain restrictions on which edges can touch which other edges. These are known as "matching rules" and are the main identifying feature of penrose tiles compared to other aperiodic tilings. The specific matching rules do allow
+filling an infinite plane but do not allow any patch to repeat end to end forever.
+
+### How decomposition works?
+
+While the matching rules guarentee a way to fill a infinite plane exist, [you can't just lay tiles randomly and expect not get stuck](https://math.stackexchange.com/questions/2548075/penrose-tilings-with-physical-tiles). Additionally, we need a convenient "coordinate system" to allow us to easily refer to a specific tile.
+
+One method to fill the grid is with so called "substitution tiling". We can define a group of tiles such that the group can tile the same way as the smaller shape, assuming the matching rules are followed. We can then combine some number of these groups into larger groups based on the same rules, and so on forever. This allows us to fill a shape of any size.
+
+This is the substition pattern we use:
 
 ![A diagram of where on the big shapes each small shape appears](./images/shapeA.svg)
 
-As you can see a "thick" rhomb can be deconstructed into rhombs A, B, and C while a thin rhomb can be divided into D and E.
+You can combine rhombs A, B, and C to create a shape that behaves like a thick rhomb. 
 
-Note the orientation is important. For example notice that A is flipped upside down. While the shape may look symetric the matching rules don't work if any shape is flipped the other way around.
+Note the orientation is important. For example notice that A is flipped upside down. While the shape may look symetric the matching rules don't work if any shape is flipped the other way around. This is nececairy because the matching rules mean only some edges can match.
 
-A complicating factor is how the shapes do not perfectly fill the outer rhombs. However, this isn't actually an issue, since by the matching rules we know that that only certain sides can actually connect. We know the north side of the thick rhomb, which has a chunk missing, can only connect to the north side of the thin rhomb or the east side of the the thick rhomb, both of which have a part sticking out in the correct places.
+You may notice the larger shapes are not actually shaped like rhombs themselves. However, this is not actually an issue. As long as the matching rules are followed, the parts that "stick out" of one supershape exactly match the "holes" in the shape on the other side of the edge. 
 
 The entire right half of the thin rhomb seems to be missing but it will always be
 filled by a thick rhomb coming in from the south (bottom right) and a thin rhomb from the east (top right), making the final shape symetric.
