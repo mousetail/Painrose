@@ -1,43 +1,38 @@
 mod draw;
-mod penrose;
+mod rhomb;
+mod tiling;
 
-fn create_ribbon(
-    start_point: penrose::TileReference,
-    direction: penrose::AbsoluteDirection,
-    length: usize,
-) -> Vec<penrose::TileReference> {
-    let mut tiles = vec![start_point];
-    let mut direction = direction;
-    for _ in 0..length {
-        let (new_tile, new_direction) = tiles.last().unwrap().go(direction);
-        println!("{new_tile:?} {:?}", new_direction.invert());
-        tiles.push(new_tile);
-        direction = new_direction.invert();
-    }
+use crate::tiling::Tiling;
 
-    tiles
+fn create_subtiles(tile: Vec<rhomb::Tile>, level: usize) -> Vec<Vec<rhomb::Tile>> {
+    use crate::rhomb::Tile::*;
+
+    let tile_options = match tile.first().unwrap_or(
+        &rhomb::RhombTiling::TILE_PATTERN[(level + 1) % rhomb::RhombTiling::TILE_PATTERN.len()],
+    ) {
+        A | C | E => vec![A, B, C],
+        D | B => vec![D, E],
+    };
+
+    return tile_options
+        .into_iter()
+        .flat_map(|t| {
+            let m = [vec![t], tile.clone()].concat();
+            if level == 0 {
+                return vec![m].into_iter();
+            } else {
+                return create_subtiles(m, level - 1).into_iter();
+            }
+        })
+        .collect();
 }
-fn main() {
-    let mut tiles = vec![];
-    tiles.extend(create_ribbon(
-        penrose::TileReference::new(vec![]),
-        penrose::AbsoluteDirection::North,
-        20,
-    ));
-    tiles.extend(create_ribbon(
-        penrose::TileReference::new(vec![])
-            .go(penrose::AbsoluteDirection::East)
-            .0,
-        penrose::AbsoluteDirection::East,
-        20,
-    ));
-    tiles.extend(create_ribbon(
-        penrose::TileReference::new(vec![])
-            .go(penrose::AbsoluteDirection::West)
-            .0,
-        penrose::AbsoluteDirection::East,
-        20,
-    ));
+fn main() -> Result<(), tiling::TileCoordinateError<rhomb::Tile>> {
+    let tiles: Result<Vec<_>, _> = create_subtiles(vec![], 3)
+        .into_iter()
+        .map(tiling::TileCoordinate::<rhomb::RhombTiling>::new)
+        .collect();
 
-    draw::draw_svg(tiles);
+    draw::draw_svg(tiles?);
+
+    Ok(())
 }

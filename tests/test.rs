@@ -1,4 +1,7 @@
-use penrose::*;
+use penrose::rhomb::*;
+use penrose::tiling::{
+    EdgeDefinitionType, OutgoingEdgeDefinition, TileCoordinate, TileCoordinateError, Tiling,
+};
 
 #[test]
 pub fn test_if_all_relations_are_symetric() {
@@ -9,12 +12,12 @@ pub fn test_if_all_relations_are_symetric() {
             AbsoluteDirection::South,
             AbsoluteDirection::West,
         ] {
-            let definition = get_internal_edge_definition(tile, direction);
+            let definition = RhombTiling::get_internal_edge_definition(tile, direction);
             match definition.edge_type {
                 EdgeDefinitionType::Inside(tile_2, direction_2) => {
                     assert_eq!(definition.direction, vec![]);
                     assert_eq!(
-                        get_internal_edge_definition(tile_2, direction_2),
+                        RhombTiling::get_internal_edge_definition(tile_2, direction_2),
                         OutgoingEdgeDefinition {
                             edge_type: EdgeDefinitionType::Inside(tile, direction),
                             direction: vec![]
@@ -26,11 +29,10 @@ pub fn test_if_all_relations_are_symetric() {
                     let new_tile_type = match tile {
                         Tile::A | Tile::B | Tile::C => Tile::A,
                         Tile::D | Tile::E => Tile::B,
-                        _ => panic!("Invalid tile"),
                     };
 
                     assert_eq!(
-                        get_external_edge_definition(
+                        RhombTiling::get_external_edge_definition(
                             new_tile_type,
                             direction_2,
                             definition.direction.clone()
@@ -48,13 +50,13 @@ pub fn test_if_all_relations_are_symetric() {
 }
 
 #[test]
-fn test_if_graph_is_symetric() {
+fn test_if_graph_is_symetric() -> Result<(), TileCoordinateError<Tile>> {
     for tile_graph in [
-        TileReference::new(vec![Tile::A]),
-        TileReference::new(vec![Tile::B]),
-        TileReference::new(vec![]),
-        TileReference::new(vec![Tile::D, Tile::D]),
-        TileReference::new(vec![Tile::E, Tile::D]),
+        TileCoordinate::<RhombTiling>::new(vec![Tile::A])?,
+        TileCoordinate::<RhombTiling>::new(vec![Tile::B])?,
+        TileCoordinate::<RhombTiling>::new(vec![])?,
+        TileCoordinate::<RhombTiling>::new(vec![Tile::D, Tile::D])?,
+        TileCoordinate::<RhombTiling>::new(vec![Tile::E, Tile::D])?,
     ]
     .iter()
     {
@@ -64,8 +66,8 @@ fn test_if_graph_is_symetric() {
             AbsoluteDirection::South,
             AbsoluteDirection::West,
         ] {
-            let (new_tile, new_direction) = tile_graph.go(direction);
-            let (original_tile, original_direction) = new_tile.go(new_direction);
+            let (new_tile, new_direction) = tile_graph.go(direction)?;
+            let (original_tile, original_direction) = new_tile.go(new_direction)?;
 
             assert_eq!(
                 (&original_tile, original_direction),
@@ -74,4 +76,6 @@ fn test_if_graph_is_symetric() {
             );
         }
     }
+
+    Ok(())
 }

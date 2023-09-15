@@ -1,3 +1,3 @@
-mod penrose;
-pub use self::penrose::*;
 mod draw;
+pub mod rhomb;
+pub mod tiling;
