@@ -1,5 +1,7 @@
-use crate::draw;
-use crate::tiling::{EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling};
+use super::draw;
+use super::tiling::{
+    EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, TileCoordinateError, Tiling,
+};
 use std::f32::consts;
 
 const SCALING_FACTOR: f32 = 1.618033988;
@@ -189,7 +191,7 @@ impl Tiling for RhombTiling {
     fn get_internal_edge_definition(
         tile: Self::Tile,
         direction: Self::Edge,
-    ) -> crate::tiling::OutgoingEdgeDefinition<Self::Tile, Self::Edge> {
+    ) -> OutgoingEdgeDefinition<Self::Tile, Self::Edge> {
         match tile {
             Tile::A => match direction {
                 AbsoluteDirection::North => OutgoingEdgeDefinition {
@@ -287,8 +289,8 @@ impl Tiling for RhombTiling {
     fn get_external_edge_definition(
         tile: Self::Tile,
         direction: Self::Edge,
-        side: Vec<crate::tiling::RelativeDirection>,
-    ) -> crate::tiling::OutgoingEdgeDefinition<Self::Tile, Self::Edge> {
+        side: Vec<RelativeDirection>,
+    ) -> OutgoingEdgeDefinition<Self::Tile, Self::Edge> {
         match tile {
             Tile::A | Tile::C | Tile::E => match (direction, side.as_slice()) {
                 // North
@@ -418,11 +420,11 @@ impl Tiling for RhombTiling {
     fn can_tile_fit_in_tile(
         inner_tile: Self::Tile,
         outer_tile: Self::Tile,
-    ) -> Result<(), crate::tiling::TileCoordinateError<Self::Tile>> {
+    ) -> Result<(), TileCoordinateError<Self::Tile>> {
         match (inner_tile, outer_tile) {
             (Tile::A | Tile::B | Tile::C, Tile::A | Tile::C | Tile::E)
             | (Tile::D | Tile::E, Tile::B | Tile::D) => Ok(()),
-            _ => Err(crate::tiling::TileCoordinateError {
+            _ => Err(TileCoordinateError {
                 inner_tile,
                 outer_tile,
             }),

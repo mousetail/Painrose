@@ -1,15 +1,15 @@
-mod draw;
-mod rhomb;
-mod tiling;
+pub mod geometry;
 
-use crate::tiling::Tiling;
+use crate::geometry::draw;
+use crate::geometry::rhomb::{RhombTiling, Tile};
+use crate::geometry::tiling::{TileCoordinate, TileCoordinateError, Tiling};
 
-fn create_subtiles(tile: Vec<rhomb::Tile>, level: usize) -> Vec<Vec<rhomb::Tile>> {
-    use crate::rhomb::Tile::*;
-
-    let tile_options = match tile.first().unwrap_or(
-        &rhomb::RhombTiling::TILE_PATTERN[(level + 1) % rhomb::RhombTiling::TILE_PATTERN.len()],
-    ) {
+fn create_subtiles(tile: Vec<Tile>, level: usize) -> Vec<Vec<Tile>> {
+    use Tile::*;
+    let tile_options = match tile
+        .first()
+        .unwrap_or(&RhombTiling::TILE_PATTERN[(level + 1) % RhombTiling::TILE_PATTERN.len()])
+    {
         A | C | E => vec![A, B, C],
         D | B => vec![D, E],
     };
@@ -26,10 +26,10 @@ fn create_subtiles(tile: Vec<rhomb::Tile>, level: usize) -> Vec<Vec<rhomb::Tile>
         })
         .collect();
 }
-fn main() -> Result<(), tiling::TileCoordinateError<rhomb::Tile>> {
+fn main() -> Result<(), TileCoordinateError<Tile>> {
     let tiles: Result<Vec<_>, _> = create_subtiles(vec![], 3)
         .into_iter()
-        .map(tiling::TileCoordinate::<rhomb::RhombTiling>::new)
+        .map(TileCoordinate::<RhombTiling>::new)
         .collect();
 
     draw::draw_svg(tiles?);

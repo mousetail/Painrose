@@ -1,5 +1,5 @@
-use penrose::rhomb::*;
-use penrose::tiling::{
+use penrose::geometry::rhomb::*;
+use penrose::geometry::tiling::{
     EdgeDefinitionType, OutgoingEdgeDefinition, TileCoordinate, TileCoordinateError, Tiling,
 };
 
