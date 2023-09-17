@@ -96,7 +96,7 @@ Note: All directions are relative and will push you in a different direction dep
 
 * `+-*/` Basic arithmetic. On arrays does concat, difference, product, 
 * `!` Power
-* `sc` Sine, Cosine
+* `SC` Sine, Cosine
 * `g` Natural Logarithm
 * `_` Negate
 
@@ -104,14 +104,14 @@ Note: All directions are relative and will push you in a different direction dep
 
 #### Input
 
-* `c` Take a character as input
+* `i` Take a character as input
 * `l` Take an entire line as input as an array
 * `w` Take a word as input
 * `n` Parse a word as a number and take that as input
 
 #### Output
 
-* `C` Output a character
+* `I` Output a character
 * `W` Output an array at once
 * `L` Pop N then output the top N characters from the stack, flattens over arrays
 * `N` Output a number

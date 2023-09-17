@@ -26,9 +26,14 @@ impl RelativeDirection {
     }
 }
 
+pub trait All: Sized {
+    fn all() -> &'static [Self];
+    fn index(self) -> usize;
+}
+
 pub trait Tiling {
-    type Edge: 'static + Copy + Clone + PartialEq + std::fmt::Debug;
-    type Tile: 'static + Copy + Clone + PartialEq + std::fmt::Debug;
+    type Edge: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + All;
+    type Tile: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + All;
 
     const TILE_PATTERN: &'static [Self::Tile];
 
@@ -72,6 +77,14 @@ impl<T: Tiling> Clone for TileCoordinate<T> {
 impl<T: Tiling> PartialEq for TileCoordinate<T> {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
+    }
+}
+
+impl<T: Tiling> Eq for TileCoordinate<T> {}
+
+impl<T: Tiling> std::hash::Hash for TileCoordinate<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.hash(state);
     }
 }
 
@@ -170,6 +183,35 @@ impl<T: Tiling> TileCoordinate<T> {
                     index += 1;
                     definition = T::get_internal_edge_definition(copy.get_at(index), direction)
                 }
+            }
+        }
+    }
+
+    pub fn next(&self) -> Self {
+        let mut copy = self.0.clone();
+        let options = <T as Tiling>::Tile::all();
+
+        loop {
+            let mut index = 0;
+            loop {
+                while copy.len() <= index {
+                    copy.push(T::TILE_PATTERN[copy.len() % T::TILE_PATTERN.len()])
+                }
+
+                let item = *(copy.as_slice().get(index).unwrap());
+                let option_index = item.index();
+                if option_index < options.len() - 1 {
+                    copy[index] = options[option_index + 1];
+                    break;
+                } else {
+                    copy[index] = options[0];
+                    index += 1;
+                }
+            }
+
+            match Self::new(copy.clone()) {
+                Ok(k) => break k,
+                Err(_e) => (),
             }
         }
     }

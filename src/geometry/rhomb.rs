@@ -1,13 +1,15 @@
+use crate::language::FollowableDirection;
+
 use super::draw;
 use super::tiling::{
-    EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, TileCoordinateError, Tiling,
+    All, EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, TileCoordinateError, Tiling,
 };
 use std::f32::consts;
 
 const SCALING_FACTOR: f32 = 1.618033988;
 const SCALING_FACTOR_INVERSE: f32 = 1.0 / SCALING_FACTOR;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AbsoluteDirection {
     North,
     East,
@@ -15,9 +17,26 @@ pub enum AbsoluteDirection {
     West,
 }
 
-impl AbsoluteDirection {
-    #[allow(unused)]
-    pub fn invert(self) -> Self {
+impl FollowableDirection for AbsoluteDirection {
+    fn turn_left(self) -> Self {
+        match self {
+            AbsoluteDirection::North => AbsoluteDirection::West,
+            AbsoluteDirection::East => AbsoluteDirection::South,
+            AbsoluteDirection::South => AbsoluteDirection::East,
+            AbsoluteDirection::West => AbsoluteDirection::North,
+        }
+    }
+
+    fn turn_right(self) -> Self {
+        match self {
+            AbsoluteDirection::North => AbsoluteDirection::East,
+            AbsoluteDirection::East => AbsoluteDirection::South,
+            AbsoluteDirection::South => AbsoluteDirection::West,
+            AbsoluteDirection::West => AbsoluteDirection::North,
+        }
+    }
+
+    fn opposite(self) -> Self {
         match self {
             AbsoluteDirection::North => AbsoluteDirection::South,
             AbsoluteDirection::East => AbsoluteDirection::West,
@@ -27,7 +46,27 @@ impl AbsoluteDirection {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+impl All for AbsoluteDirection {
+    fn all() -> &'static [Self] {
+        &[
+            AbsoluteDirection::North,
+            AbsoluteDirection::East,
+            AbsoluteDirection::South,
+            AbsoluteDirection::West,
+        ]
+    }
+
+    fn index(self) -> usize {
+        match self {
+            Self::North => 0,
+            Self::East => 1,
+            Self::South => 2,
+            Self::West => 3,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum Tile {
     A,
     B,
@@ -42,6 +81,22 @@ struct ShapeInfo {
     height: f32,
     bottom_angle: f32,
     side_angle: f32,
+}
+
+impl All for Tile {
+    fn all() -> &'static [Tile] {
+        &[Tile::A, Tile::B, Tile::C, Tile::D, Tile::E]
+    }
+
+    fn index(self) -> usize {
+        match self {
+            Tile::A => 0,
+            Tile::B => 1,
+            Tile::C => 2,
+            Tile::D => 3,
+            Tile::E => 4,
+        }
+    }
 }
 
 impl ShapeInfo {
