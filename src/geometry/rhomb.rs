@@ -205,17 +205,17 @@ impl draw::DrawableTile for Tile {
             Vec2::new(0.0, -rhomb.height / 2.0),
             Vec2::new(rhomb.width / 2.0, 0.0),
             //
-            Vec2::new(rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
-            Vec2::new(0.05, 0.05),
-            Vec2::new(0.05, 0.1),
-            Vec2::new(rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
+            // Vec2::new(rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
+            // Vec2::new(0.05, 0.05),
+            // Vec2::new(0.05, 0.1),
+            // Vec2::new(rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
             //
             Vec2::new(0.0, rhomb.height / 2.0),
             //
-            Vec2::new(-rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
-            Vec2::new(-0.05, 0.1),
-            Vec2::new(-0.05, 0.05),
-            Vec2::new(-rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
+            // Vec2::new(-rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
+            // Vec2::new(-0.05, 0.1),
+            // Vec2::new(-0.05, 0.05),
+            // Vec2::new(-rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
         ];
     }
 

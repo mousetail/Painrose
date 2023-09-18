@@ -88,8 +88,8 @@ where
         if draw_options.label.len() > 0 {
             writeln!(
                 file,
-                "<text font-family=\"sans-serif\" font-size=\"1\" x=\"{}\" y=\"{}\"><![CDATA[{}]]></text>",
-                base_position.x, base_position.y, draw_options.label.replace("]]>", "]]>]]&gt;<!CDATA[")
+                "<text font-family=\"sans-serif\" font-size=\"0.5\" x=\"{}\" y=\"{}\" text-anchor=\"middle\" dominant-baseline=\"middle\" fill=\"{}\"><![CDATA[{}]]></text>",
+                base_position.x, base_position.y, if draw_options.fill { "white" } else {"black"}, draw_options.label.replace("]]>", "]]>]]&gt;<!CDATA[")
             )?;
         }
     }

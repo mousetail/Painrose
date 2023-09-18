@@ -14,7 +14,12 @@ where
         .map(|(coord, code)| draw::TileDrawOptions {
             coordinate: coord.clone(),
             fill: coord == &state.instruction_pointer,
-            label: code.0.to_string(),
+            label: match code.0 {
+                '\n' => '¶',
+                '\t' => '↹',
+                a => a,
+            }
+            .to_string(),
             supertile_index: 0,
         })
         .collect();
