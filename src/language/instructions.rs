@@ -118,6 +118,13 @@ fn array_wrap(stack: &mut Vec<StackItem>, n: StackItem) -> StackItem {
 }
 
 impl Instruction {
+    pub fn is_nonconditional_movement_instruction(self) -> bool {
+        match self {
+            Self::TurnLeft | Self::TurnRight | Self::TurnAround => true,
+            _ => false,
+        }
+    }
+
     pub fn from_char(item: char) -> Option<Self> {
         match item {
             '<' => Some(Self::TurnLeft),

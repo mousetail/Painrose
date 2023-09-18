@@ -36,7 +36,20 @@ where
         let instuction = self.code.get(&self.instruction_pointer);
 
         let behavior = if let Some((ch, Some(instruction))) = instuction {
-            instruction.evaluate(&mut self.mode, &mut self.stack)
+            if instruction.is_nonconditional_movement_instruction() {
+                instruction.evaluate(&mut self.mode, &mut self.stack)
+            } else {
+                match self.mode {
+                    Mode::NormalMode => instruction.evaluate(&mut self.mode, &mut self.stack),
+                    Mode::CharMode => {
+                        self.mode = Mode::NormalMode;
+                        self.stack
+                            .push(stack_item::StackItem::Number(*ch as u32 as f64));
+                        InstructionPointerBehavior::Straight
+                    }
+                    _ => InstructionPointerBehavior::Straight,
+                }
+            }
         } else {
             InstructionPointerBehavior::Straight
         };
