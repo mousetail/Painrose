@@ -1,7 +1,9 @@
 mod instructions;
 mod stack_item;
 use std::collections::HashMap;
+mod draw;
 
+use crate::geometry::draw::DrawableTile;
 use crate::geometry::tiling::All;
 use crate::geometry::tiling::{TileCoordinate, Tiling};
 
@@ -68,5 +70,16 @@ where
             stack: vec![],
             mode: Mode::NormalMode,
         }
+    }
+}
+
+impl<T: Tiling> LanguageState<T>
+where
+    T::Tile: DrawableTile,
+    T::Edge: FollowableDirection,
+{
+    #[allow(unused)]
+    pub fn draw(&self) -> std::io::Result<()> {
+        super::language::draw::draw(self)
     }
 }

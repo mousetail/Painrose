@@ -135,19 +135,18 @@ impl draw::DrawableTile for Tile {
     const SCALING_FACTOR: f32 = SCALING_FACTOR;
     type Data = AllShapeInfos;
 
-    fn get_coordinate(self, shape_info: AllShapeInfos) -> (glam::Vec3, f32) {
-        use glam::Vec3;
+    fn get_coordinate(self, shape_info: AllShapeInfos) -> (glam::Vec2, f32) {
+        use glam::Vec2;
         match self {
             Tile::A => (
-                Vec3::new(
+                Vec2::new(
                     0.0,
                     (shape_info.thick_rhomb.height - SCALING_FACTOR_INVERSE) * 0.5,
-                    0.0,
                 ),
                 consts::PI,
             ),
             Tile::B => (
-                Vec3::new(
+                Vec2::new(
                     (-shape_info.thick_rhomb.bottom_angle / 2.0 + consts::FRAC_PI_2).sin()
                         * shape_info.thin_rhomb.width
                         * SCALING_FACTOR_INVERSE
@@ -158,15 +157,13 @@ impl draw::DrawableTile for Tile {
                         / 2.0
                         + 0.5
                         - SCALING_FACTOR_INVERSE,
-                    0.0,
                 ),
                 -shape_info.thick_rhomb.side_angle / 2.0 + consts::FRAC_PI_2,
             ),
             Tile::C => (
-                Vec3::new(
+                Vec2::new(
                     -shape_info.thick_rhomb.width / 4.0,
                     -shape_info.thick_rhomb.height / 4.0,
-                    0.0,
                 ),
                 shape_info.thick_rhomb.bottom_angle / 2.0 - consts::PI,
             ),
@@ -178,27 +175,25 @@ impl draw::DrawableTile for Tile {
                     SCALING_FACTOR_INVERSE
                 );
                 (
-                    Vec3::new(
+                    Vec2::new(
                         -shape_info.thin_rhomb.width * 0.5 * scaling_factor,
                         shape_info.thin_rhomb.height * 0.5 * (1.0 - scaling_factor),
-                        0.0,
                     ),
                     shape_info.thin_rhomb.side_angle / 2.0 + consts::FRAC_PI_2,
                 )
             }
             Tile::E => (
-                Vec3::new(
+                Vec2::new(
                     -shape_info.thin_rhomb.width * 0.25,
                     -shape_info.thin_rhomb.height * 0.25,
-                    0.0,
                 ),
                 shape_info.thin_rhomb.bottom_angle / 2.0 + consts::PI,
             ),
         }
     }
 
-    fn get_shape(self, shape_info: AllShapeInfos) -> Vec<glam::Vec3> {
-        use glam::Vec3;
+    fn get_shape(self, shape_info: AllShapeInfos) -> Vec<glam::Vec2> {
+        use glam::Vec2;
 
         let rhomb = match self {
             Tile::A | Tile::C | Tile::E => shape_info.thick_rhomb,
@@ -206,21 +201,21 @@ impl draw::DrawableTile for Tile {
         };
 
         return vec![
-            Vec3::new(-rhomb.width / 2.0, 0.0, 0.0),
-            Vec3::new(0.0, -rhomb.height / 2.0, 0.0),
-            Vec3::new(rhomb.width / 2.0, 0.0, 0.0),
+            Vec2::new(-rhomb.width / 2.0, 0.0),
+            Vec2::new(0.0, -rhomb.height / 2.0),
+            Vec2::new(rhomb.width / 2.0, 0.0),
             //
-            Vec3::new(rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45, 0.0),
-            Vec3::new(0.05, 0.05, 0.0),
-            Vec3::new(0.05, 0.1, 0.0),
-            Vec3::new(rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55, 0.0),
+            Vec2::new(rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
+            Vec2::new(0.05, 0.05),
+            Vec2::new(0.05, 0.1),
+            Vec2::new(rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
             //
-            Vec3::new(0.0, rhomb.height / 2.0, 0.0),
+            Vec2::new(0.0, rhomb.height / 2.0),
             //
-            Vec3::new(-rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55, 0.0),
-            Vec3::new(-0.05, 0.1, 0.0),
-            Vec3::new(-0.05, 0.05, 0.0),
-            Vec3::new(-rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45, 0.0),
+            Vec2::new(-rhomb.width / 2.0 * 0.45, rhomb.height / 2.0 * 0.55),
+            Vec2::new(-0.05, 0.1),
+            Vec2::new(-0.05, 0.05),
+            Vec2::new(-rhomb.width / 2.0 * 0.55, rhomb.height / 2.0 * 0.45),
         ];
     }
 

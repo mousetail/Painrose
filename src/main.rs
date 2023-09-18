@@ -7,4 +7,6 @@ fn main() {
 
     let code = std::fs::read_to_string(&args[1]).unwrap();
     let program = language::LanguageState::<geometry::rhomb::RhombTiling>::new_from_string(code);
+
+    program.draw().unwrap();
 }
