@@ -63,11 +63,11 @@ pub enum InstructionPointerBehavior {
     Back,
 }
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Debug, Clone)]
 pub enum Mode {
     NormalMode,
-    CharStringMode,
-    ArrayStringMode,
+    CharStringMode(Vec<char>),
+    ArrayStringMode(Vec<char>),
     CharMode,
 }
 
@@ -276,8 +276,8 @@ impl Instruction {
                 let wrapped_stack_item = array_wrap(stack, n);
                 stack.push(wrapped_stack_item);
             }
-            Instruction::StartCharacterString => *mode = Mode::CharStringMode,
-            Instruction::StartArrayString => *mode = Mode::ArrayStringMode,
+            Instruction::StartCharacterString => *mode = Mode::CharStringMode(vec![]),
+            Instruction::StartArrayString => *mode = Mode::ArrayStringMode(vec![]),
             Instruction::StartCharacter => *mode = Mode::CharMode,
             Instruction::Const(i) => stack.push(i.into()),
             Instruction::Pi => stack.push(std::f64::consts::PI.into()),

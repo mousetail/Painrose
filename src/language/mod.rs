@@ -39,12 +39,37 @@ where
             if instruction.is_nonconditional_movement_instruction() {
                 instruction.evaluate(&mut self.mode, &mut self.stack)
             } else {
-                match self.mode {
+                match &mut self.mode {
                     Mode::NormalMode => instruction.evaluate(&mut self.mode, &mut self.stack),
                     Mode::CharMode => {
                         self.mode = Mode::NormalMode;
                         self.stack
                             .push(stack_item::StackItem::Number(*ch as u32 as f64));
+                        InstructionPointerBehavior::Straight
+                    }
+                    Mode::ArrayStringMode(e) => {
+                        if *ch == '"' {
+                            self.stack.push(stack_item::StackItem::Array(
+                                e.into_iter()
+                                    .map(|k| stack_item::StackItem::Number(*k as u32 as f64))
+                                    .collect(),
+                            ));
+                            self.mode = Mode::NormalMode;
+                        } else {
+                            e.push(*ch);
+                        };
+                        InstructionPointerBehavior::Straight
+                    }
+                    Mode::CharStringMode(e) => {
+                        if *ch == '\'' {
+                            self.stack.extend(
+                                e.into_iter()
+                                    .map(|k| stack_item::StackItem::Number(*k as u32 as f64)),
+                            );
+                            self.mode = Mode::NormalMode;
+                        } else {
+                            e.push(*ch);
+                        };
                         InstructionPointerBehavior::Straight
                     }
                     _ => InstructionPointerBehavior::Straight,
