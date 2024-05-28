@@ -1,5 +1,5 @@
 // TODO: Fix the D rhomb, and the angles
-use super::tiling::{TileCoordinate, Tiling};
+use super::{tile_coordinate::TileCoordinate, tiling::Tiling};
 use glam::f32::*;
 use std::io::Write;
 

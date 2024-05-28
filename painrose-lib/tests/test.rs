@@ -1,6 +1,7 @@
 use painrose_lib::geometry::rhomb::*;
+use painrose_lib::geometry::tile_coordinate::{CoordinateTraversalError, TileCoordinate};
 use painrose_lib::geometry::tiling::{
-    EdgeDefinitionType, OutgoingEdgeDefinition, TileCoordinate, TileCoordinateError, Tiling,
+    EdgeDefinitionType, OutgoingEdgeDefinition, Tiling,
 };
 
 #[test]
@@ -50,7 +51,7 @@ pub fn test_if_all_relations_are_symetric() {
 }
 
 #[test]
-fn test_if_graph_is_symetric() -> Result<(), TileCoordinateError<Tile>> {
+fn test_if_graph_is_symetric() -> Result<(), CoordinateTraversalError<Tile>> {
     for tile_graph in [
         TileCoordinate::<RhombTiling>::new(vec![Tile::A])?,
         TileCoordinate::<RhombTiling>::new(vec![Tile::B])?,

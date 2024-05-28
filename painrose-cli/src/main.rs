@@ -5,7 +5,7 @@ fn main() {
     println!("{args:?}");
 
     let code = std::fs::read_to_string(&args[1]).unwrap();
-    let program = language::LanguageState::<geometry::rhomb::RhombTiling>::new_from_string(code);
+    let program = language::LanguageState::<geometry::rhomb::RhombTiling>::new_from_string(code).unwrap();
 
     program.draw().unwrap();
 }

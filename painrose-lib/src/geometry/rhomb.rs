@@ -1,8 +1,9 @@
 use crate::language::FollowableDirection;
 
 use super::draw;
+use super::tile_coordinate::CoordinateTraversalError;
 use super::tiling::{
-    All, EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, TileCoordinateError, Tiling,
+    All, EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling,
 };
 use std::f32::consts;
 
@@ -95,6 +96,21 @@ impl All for Tile {
             Tile::C => 2,
             Tile::D => 3,
             Tile::E => 4,
+        }
+    }
+}
+
+impl TryFrom<char> for Tile {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, char> {
+        match value.to_ascii_lowercase() {
+            'a' => Ok(Tile::A),
+            'b' => Ok(Tile::B),
+            'c' => Ok(Tile::C),
+            'd' => Ok(Tile::D),
+            'e' => Ok(Tile::E),
+            err => Err(err)
         }
     }
 }
@@ -470,11 +486,11 @@ impl Tiling for RhombTiling {
     fn can_tile_fit_in_tile(
         inner_tile: Self::Tile,
         outer_tile: Self::Tile,
-    ) -> Result<(), TileCoordinateError<Self::Tile>> {
+    ) -> Result<(), CoordinateTraversalError<Self::Tile>> {
         match (inner_tile, outer_tile) {
             (Tile::A | Tile::B | Tile::C, Tile::A | Tile::C | Tile::E)
             | (Tile::D | Tile::E, Tile::B | Tile::D) => Ok(()),
-            _ => Err(TileCoordinateError {
+            _ => Err(CoordinateTraversalError {
                 inner_tile,
                 outer_tile,
             }),

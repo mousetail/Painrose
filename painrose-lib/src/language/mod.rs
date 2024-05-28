@@ -1,11 +1,15 @@
 mod instructions;
 mod stack_item;
-use std::collections::HashMap;
 mod draw;
+mod error;
+
+use std::collections::HashMap;
+use std::str::FromStr;
 
 use crate::geometry::draw::DrawableTile;
+use crate::geometry::tile_coordinate::TileCoordinate;
 use crate::geometry::tiling::All;
-use crate::geometry::tiling::{TileCoordinate, Tiling};
+use crate::geometry::tiling::{Tiling};
 
 use self::instructions::{Instruction, InstructionPointerBehavior, Mode};
 
@@ -92,7 +96,7 @@ where
     }
 
     #[allow(unused)]
-    pub fn new_from_string(source_code: String) -> Self {
+    pub fn new_from_string(source_code: String) -> Result<Self, error::ParseError> where TileCoordinate<T>: FromStr {
         let mut code = HashMap::<TileCoordinate<T>, (char, Option<Instruction>)>::new();
 
         let mut next_position = TileCoordinate::<T>::new(vec![T::Tile::all()[0]]).unwrap();
@@ -101,13 +105,13 @@ where
             next_position = next_position.next();
         }
 
-        LanguageState {
+        Ok(LanguageState {
             code,
             instruction_pointer: TileCoordinate::new(vec![]).unwrap(),
             direction: T::Edge::all()[0],
             stack: vec![],
             mode: Mode::NormalMode,
-        }
+        })
     }
 }
 
