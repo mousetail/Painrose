@@ -1,10 +1,6 @@
-[package]
-name = "penrose"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-glam = "0.24.1"
-itertools = "0.11.0"
+members = [
+    'painrose-lib'
+]
+resolver = "2"
