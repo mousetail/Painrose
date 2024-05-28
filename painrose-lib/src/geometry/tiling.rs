@@ -1,3 +1,5 @@
+use strum::VariantArray;
+
 use super::tile_coordinate::CoordinateTraversalError;
 
 #[derive(Debug, PartialEq)]
@@ -28,14 +30,9 @@ impl RelativeDirection {
     }
 }
 
-pub trait All: Sized {
-    fn all() -> &'static [Self];
-    fn index(self) -> usize;
-}
-
 pub trait Tiling {
-    type Edge: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + All;
-    type Tile: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + All;
+    type Edge: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + VariantArray;
+    type Tile: 'static + Copy + Clone + PartialEq + std::fmt::Debug + std::hash::Hash + VariantArray;
 
     const TILE_PATTERN: &'static [Self::Tile];
 

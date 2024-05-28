@@ -8,5 +8,6 @@ pub struct ParseError {
 #[derive(Debug)]
 pub enum ParseErrorKind {
     InvalidPrefixError,
-    BadCoordinateError
+    BadCoordinateError,
+    BadDirectionError
 }

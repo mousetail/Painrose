@@ -1,5 +1,5 @@
 use itertools::{EitherOrBoth, Itertools};
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 #[derive(Clone, PartialEq, Debug)]
 pub enum StackItem {
     Number(f64),
@@ -11,6 +11,15 @@ impl StackItem {
         match self {
             Self::Number(k) => *k != 0.0,
             Self::Array(k) => k.len() != 0,
+        }
+    }
+
+    fn apply_unary_operator<T: Fn(f64) -> f64>(self, operator: &T) -> StackItem {
+        match self {
+            StackItem::Number(a) => StackItem::Number(-a),
+            StackItem::Array(arr) => StackItem::Array(
+                arr.into_iter().map(|k|k.apply_unary_operator(operator)).collect()
+            )
         }
     }
 
@@ -113,5 +122,13 @@ impl Div for StackItem {
 
     fn div(self, rhs: Self) -> Self::Output {
         self.apply_binary_operator(rhs, &|a, b| a / b)
+    }
+}
+
+impl Neg for StackItem {
+    type Output = StackItem;
+
+    fn neg(self) -> Self::Output {
+        self.apply_unary_operator(&|a| -a)
     }
 }

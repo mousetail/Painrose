@@ -1,7 +1,7 @@
 
 use super::tiling::{EdgeDefinitionType, RelativeDirection, Tiling};
 use std::str::FromStr;
-use crate::geometry::tiling::All;
+use strum::VariantArray;
 
 #[derive(Copy, Clone, PartialEq, Debug, Hash)]
 pub struct CoordinateTraversalError<T> {
@@ -165,7 +165,7 @@ impl<T: Tiling> TileCoordinate<T> {
 
     pub fn next(&self) -> Self {
         let mut copy = self.0.clone();
-        let options = <T as Tiling>::Tile::all();
+        let options = <T as Tiling>::Tile::VARIANTS;
 
         loop {
             let mut index = 0;
@@ -175,7 +175,7 @@ impl<T: Tiling> TileCoordinate<T> {
                 }
 
                 let item = *(copy.as_slice().get(index).unwrap());
-                let option_index = item.index();
+                let option_index = <T as Tiling>::Tile::VARIANTS.into_iter().position(|k|*k==item).unwrap();
                 if option_index < options.len() - 1 {
                     copy[index] = options[option_index + 1];
                     break;

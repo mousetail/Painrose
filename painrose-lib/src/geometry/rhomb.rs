@@ -1,16 +1,20 @@
+use strum::VariantArray;
+
 use crate::language::FollowableDirection;
 
 use super::draw;
 use super::tile_coordinate::CoordinateTraversalError;
 use super::tiling::{
-    All, EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling,
+    EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling,
 };
 use std::f32::consts;
+use std::str::FromStr;
 
 const SCALING_FACTOR: f32 = 1.618033988;
 const SCALING_FACTOR_INVERSE: f32 = 1.0 / SCALING_FACTOR;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(VariantArray)]
 pub enum AbsoluteDirection {
     North,
     East,
@@ -47,27 +51,22 @@ impl FollowableDirection for AbsoluteDirection {
     }
 }
 
-impl All for AbsoluteDirection {
-    fn all() -> &'static [Self] {
-        &[
-            AbsoluteDirection::North,
-            AbsoluteDirection::East,
-            AbsoluteDirection::South,
-            AbsoluteDirection::West,
-        ]
-    }
+impl FromStr for AbsoluteDirection {
+    type Err = char;
 
-    fn index(self) -> usize {
-        match self {
-            Self::North => 0,
-            Self::East => 1,
-            Self::South => 2,
-            Self::West => 3,
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.chars().next().map(|t|t.to_ascii_lowercase()) {
+            Some('n') => Ok(Self::North),
+            Some('e') => Ok(Self::East),
+            Some('s') => Ok(Self::South),
+            Some('w') => Ok(Self::West),
+            _ => Err(s.chars().next().unwrap_or(' '))
         }
     }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(VariantArray)]
 pub enum Tile {
     A,
     B,
@@ -82,22 +81,6 @@ struct ShapeInfo {
     height: f32,
     bottom_angle: f32,
     side_angle: f32,
-}
-
-impl All for Tile {
-    fn all() -> &'static [Tile] {
-        &[Tile::A, Tile::B, Tile::C, Tile::D, Tile::E]
-    }
-
-    fn index(self) -> usize {
-        match self {
-            Tile::A => 0,
-            Tile::B => 1,
-            Tile::C => 2,
-            Tile::D => 3,
-            Tile::E => 4,
-        }
-    }
 }
 
 impl TryFrom<char> for Tile {

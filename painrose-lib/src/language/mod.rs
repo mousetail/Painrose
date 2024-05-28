@@ -5,11 +5,11 @@ mod error;
 
 use std::collections::HashMap;
 use std::str::FromStr;
+use strum::VariantArray;
 
 use crate::geometry::draw::DrawableTile;
 use crate::geometry::tile_coordinate::TileCoordinate;
-use crate::geometry::tiling::All;
-use crate::geometry::tiling::{Tiling};
+use crate::geometry::tiling::Tiling;
 
 use self::instructions::{Instruction, InstructionPointerBehavior, Mode};
 
@@ -38,50 +38,45 @@ where
     #[allow(unused)]
     pub fn step(&mut self) {
         let instuction = self.code.get(&self.instruction_pointer);
+        println!("{instuction:?} {:?}", self.mode);
 
-        let behavior = if let Some((ch, Some(instruction))) = instuction {
-            if instruction.is_nonconditional_movement_instruction() {
-                instruction.evaluate(&mut self.mode, &mut self.stack)
-            } else {
+        let get_instruction_char_or_default = ||stack_item::StackItem::Number(instuction.map(|t|t.0 as u32 as f64).unwrap_or(0.0));
+
+        let behavior = 
                 match &mut self.mode {
-                    Mode::NormalMode => instruction.evaluate(&mut self.mode, &mut self.stack),
+                    Mode::NormalMode => if let Some((ch, Some(instruction))) = instuction {instruction.evaluate(&mut self.mode, &mut self.stack)} else {
+                        InstructionPointerBehavior::Straight
+                    },
                     Mode::CharMode => {
                         self.mode = Mode::NormalMode;
                         self.stack
-                            .push(stack_item::StackItem::Number(*ch as u32 as f64));
+                            .push(get_instruction_char_or_default());
                         InstructionPointerBehavior::Straight
                     }
                     Mode::ArrayStringMode(e) => {
-                        if *ch == '"' {
+                        if let Some(Instruction::StartArrayString) = instuction.and_then(|k|k.1) {
                             self.stack.push(stack_item::StackItem::Array(
-                                e.into_iter()
-                                    .map(|k| stack_item::StackItem::Number(*k as u32 as f64))
-                                    .collect(),
+                                e.clone()
                             ));
                             self.mode = Mode::NormalMode;
                         } else {
-                            e.push(*ch);
+                            e.push(get_instruction_char_or_default());
                         };
                         InstructionPointerBehavior::Straight
                     }
                     Mode::CharStringMode(e) => {
-                        if *ch == '\'' {
+                        if let Some(Instruction::StartCharacterString) = instuction.and_then(|k|k.1) {
                             self.stack.extend(
-                                e.into_iter()
-                                    .map(|k| stack_item::StackItem::Number(*k as u32 as f64)),
+                                e.iter().cloned()
                             );
                             self.mode = Mode::NormalMode;
                         } else {
-                            e.push(*ch);
+                            e.push(get_instruction_char_or_default());
                         };
                         InstructionPointerBehavior::Straight
                     }
                     _ => InstructionPointerBehavior::Straight,
-                }
-            }
-        } else {
-            InstructionPointerBehavior::Straight
-        };
+                };
 
         let next_direction = match behavior {
             InstructionPointerBehavior::Straight => self.direction,
@@ -96,22 +91,62 @@ where
     }
 
     #[allow(unused)]
-    pub fn new_from_string(source_code: String) -> Result<Self, error::ParseError> where TileCoordinate<T>: FromStr {
-        let mut code = HashMap::<TileCoordinate<T>, (char, Option<Instruction>)>::new();
+    pub fn new_from_string(source_code: String) -> Result<Self, error::ParseError> where
+    TileCoordinate<T>: FromStr,
+    T::Edge: FromStr {
+        let mut program = HashMap::<TileCoordinate<T>, (char, Option<Instruction>)>::new();
+        for (line_number, line) in source_code.lines().enumerate() {
+            let Some((coordinate, code)) = line.split_once(':') else { return Err(error::ParseError{line: line_number, column: 0, kind: error::ParseErrorKind::InvalidPrefixError}) };
 
-        let mut next_position = TileCoordinate::<T>::new(vec![T::Tile::all()[0]]).unwrap();
-        for char in source_code.chars() {
-            code.insert(next_position.clone(), (char, Instruction::from_char(char)));
-            next_position = next_position.next();
+            let (coordinate, mut direction) = match line.split_once('-') {
+                Some((coodinate, direction)) => (
+                    coodinate,
+                    direction.parse().map_err(|e|error::ParseError{
+                        line: line_number + 1,
+                        column: coodinate.len(),
+                        kind: error::ParseErrorKind::BadDirectionError
+                    })?
+                ),
+                None => {
+                    (coordinate, T::Edge::VARIANTS[0])
+                }
+            };
+
+            let mut coordinate: TileCoordinate<T>= match coordinate.parse() {
+                Ok(coord) => coord,
+                Err(e) => return Err(error::ParseError { line: line_number, column: 0, kind: error::ParseErrorKind::BadCoordinateError })
+            };
+
+            for (index, char) in code.chars().enumerate() {
+                while program.contains_key(&coordinate) {
+                    (coordinate, direction) = match coordinate.go(direction) {
+                        Ok((coordinate, direction)) => (coordinate, direction.opposite()),
+                        Err(e) => return Err(error::ParseError {
+                            line: line_number,
+                            column: index,
+                            kind: error::ParseErrorKind::BadCoordinateError
+                        })
+                    };
+                }
+
+                program.insert(coordinate.clone(), (char, Instruction::from_char(char)));
+            }
         }
 
         Ok(LanguageState {
-            code,
+            code: program,
             instruction_pointer: TileCoordinate::new(vec![]).unwrap(),
-            direction: T::Edge::all()[0],
+            direction: T::Edge::VARIANTS[0],
             stack: vec![],
             mode: Mode::NormalMode,
         })
+    }
+
+    pub fn is_running(&self) -> bool {
+        match self.mode {
+            Mode::Stopped => false,
+            _ => true
+        }
     }
 }
 

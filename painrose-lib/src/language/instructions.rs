@@ -28,18 +28,11 @@ pub enum Instruction {
     StartCharacter,
     // Constants
     Const(u8),
-    Pi,
-    Phi,
-    E,
     // Math
     Add,
     Subtract,
     Multiply,
     Divide,
-    Power,
-    Sine,
-    Cosine,
-    Logarithm,
     Negate,
     // Input
     InputCharacter,
@@ -53,6 +46,8 @@ pub enum Instruction {
     // Array
     GetArrayN,
     PutArrayN,
+    // Exit
+    Quit
 }
 
 #[derive(PartialEq, Debug, Copy, Clone)]
@@ -66,9 +61,10 @@ pub enum InstructionPointerBehavior {
 #[derive(PartialEq, Debug, Clone)]
 pub enum Mode {
     NormalMode,
-    CharStringMode(Vec<char>),
-    ArrayStringMode(Vec<char>),
+    CharStringMode(Vec<StackItem>),
+    ArrayStringMode(Vec<StackItem>),
     CharMode,
+    Stopped
 }
 
 fn top_of_stack_or_default(stack: &mut Vec<StackItem>) -> StackItem {
@@ -161,18 +157,11 @@ impl Instruction {
             '7' => Some(Self::Const(7)),
             '8' => Some(Self::Const(8)),
             '9' => Some(Self::Const(9)),
-            'π' => Some(Self::Pi),
-            'ϕ' => Some(Self::Phi),
-            'e' => Some(Self::E),
             // Math
             '+' => Some(Self::Add),
             '-' => Some(Self::Subtract),
             '*' => Some(Self::Multiply),
             '/' => Some(Self::Divide),
-            '!' => Some(Self::Power),
-            'S' => Some(Self::Sine),
-            'C' => Some(Self::Cosine),
-            'g' => Some(Self::Logarithm),
             '_' => Some(Self::Negate),
             // Input
             'i' => Some(Self::InputCharacter),
@@ -186,6 +175,8 @@ impl Instruction {
             // Arrays
             '[' => Some(Self::GetArrayN),
             ']' => Some(Self::PutArrayN),
+            // Stop
+            ';' => Some(Self::Quit),
             _ => None,
         }
     }
@@ -280,9 +271,6 @@ impl Instruction {
             Instruction::StartArrayString => *mode = Mode::ArrayStringMode(vec![]),
             Instruction::StartCharacter => *mode = Mode::CharMode,
             Instruction::Const(i) => stack.push(i.into()),
-            Instruction::Pi => stack.push(std::f64::consts::PI.into()),
-            Instruction::Phi => todo!(),
-            Instruction::E => stack.push(std::f64::consts::E.into()),
             Instruction::Add => {
                 let (a, b) = top_two_of_stack_or_default(stack);
                 stack.push(a + b);
@@ -299,11 +287,10 @@ impl Instruction {
                 let (a, b) = top_two_of_stack_or_default(stack);
                 stack.push(a / b);
             }
-            Instruction::Power => todo!(),
-            Instruction::Sine => todo!(),
-            Instruction::Cosine => todo!(),
-            Instruction::Logarithm => todo!(),
-            Instruction::Negate => todo!(),
+            Instruction::Negate => {
+                let m = top_of_stack_or_default(stack);
+                stack.push(-m);
+            },
             Instruction::InputCharacter => todo!(),
             Instruction::InputLine => todo!(),
             Instruction::InputWord => todo!(),
@@ -313,6 +300,8 @@ impl Instruction {
             Instruction::OutputNumber => todo!(),
             Instruction::GetArrayN => todo!(),
             Instruction::PutArrayN => todo!(),
+
+            Instruction::Quit => *mode = Mode::Stopped
         }
         return behavior;
     }
