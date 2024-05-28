@@ -1,4 +1,4 @@
-use strum::VariantArray;
+use strum::{EnumString, VariantArray};
 
 use crate::language::FollowableDirection;
 
@@ -8,17 +8,20 @@ use super::tiling::{
     EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling,
 };
 use std::f32::consts;
-use std::str::FromStr;
 
 const SCALING_FACTOR: f32 = 1.618033988;
 const SCALING_FACTOR_INVERSE: f32 = 1.0 / SCALING_FACTOR;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-#[derive(VariantArray)]
+#[derive(VariantArray, EnumString)]
 pub enum AbsoluteDirection {
+    #[strum(serialize = "north", serialize = "n", ascii_case_insensitive)]
     North,
+    #[strum(serialize = "east", serialize = "e", ascii_case_insensitive)]
     East,
+    #[strum(serialize = "south", serialize = "s", ascii_case_insensitive)]
     South,
+    #[strum(serialize = "west", serialize = "w", ascii_case_insensitive)]
     West,
 }
 
@@ -47,20 +50,6 @@ impl FollowableDirection for AbsoluteDirection {
             AbsoluteDirection::East => AbsoluteDirection::West,
             AbsoluteDirection::South => AbsoluteDirection::North,
             AbsoluteDirection::West => AbsoluteDirection::East,
-        }
-    }
-}
-
-impl FromStr for AbsoluteDirection {
-    type Err = char;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.chars().next().map(|t|t.to_ascii_lowercase()) {
-            Some('n') => Ok(Self::North),
-            Some('e') => Ok(Self::East),
-            Some('s') => Ok(Self::South),
-            Some('w') => Ok(Self::West),
-            _ => Err(s.chars().next().unwrap_or(' '))
         }
     }
 }

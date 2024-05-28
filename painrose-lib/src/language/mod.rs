@@ -98,11 +98,11 @@ where
         for (line_number, line) in source_code.lines().enumerate() {
             let Some((coordinate, code)) = line.split_once(':') else { return Err(error::ParseError{line: line_number, column: 0, kind: error::ParseErrorKind::InvalidPrefixError}) };
 
-            let (coordinate, mut direction) = match line.split_once('-') {
+            let (coordinate, mut direction) = match coordinate.split_once('-') {
                 Some((coodinate, direction)) => (
                     coodinate,
                     direction.parse().map_err(|e|error::ParseError{
-                        line: line_number + 1,
+                        line: line_number,
                         column: coodinate.len(),
                         kind: error::ParseErrorKind::BadDirectionError
                     })?

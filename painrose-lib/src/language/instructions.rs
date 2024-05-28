@@ -1,52 +1,96 @@
+use strum::EnumString;
+
 use super::stack_item::StackItem;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(EnumString)]
 pub enum Instruction {
     // Control Flow
+    #[strum(serialize="<")]
     TurnLeft,
+    #[strum(serialize=">")]
     TurnRight,
+    #[strum(serialize="^")]
     TurnLeftIf,
+    #[strum(serialize="v")]
     TurnRightIf,
+    #[strum(serialize="|")]
     TurnAround,
+    #[strum(serialize="(")]
     Less,
+    #[strum(serialize=")")]
     Greater,
+    #[strum(serialize="=")]
     Equal,
     // Stack
+
+    #[strum(serialize=":")]
     Duplicate,
+    #[strum(serialize="#")]
     DuplicateTwo,
+    #[strum(serialize="~")]
     PopTop,
+    #[strum(serialize="s")]
     Swap,
+    #[strum(serialize="{")]
     RotateLeft,
+
+    #[strum(serialize="}")]
     RotateRight,
+
+    #[strum(serialize="d")]
     DuplicateN,
+    #[strum(serialize="c")]
     CopyNth,
+    #[strum(serialize="u")]
     UnwrapArray,
+    #[strum(serialize="a")]
     WrapArray,
     // String
+
+    #[strum(serialize="'")]
     StartCharacterString,
+    #[strum(serialize="\"")]
     StartArrayString,
+    #[strum(serialize="`")]
     StartCharacter,
     // Constants
     Const(u8),
     // Math
+    #[strum(serialize="+")]
     Add,
+    #[strum(serialize="-")]
     Subtract,
+    #[strum(serialize="*")]
     Multiply,
+    #[strum(serialize="/")]
     Divide,
+    #[strum(serialize="_")]
     Negate,
     // Input
+    #[strum(serialize="i")]
     InputCharacter,
+    #[strum(serialize="w")]
     InputLine,
+    #[strum(serialize="l")]
     InputWord,
+    #[strum(serialize="n")]
     InputNumber,
     // Output
+    #[strum(serialize="I")]
     OutputCharacter,
+    #[strum(serialize="W")]
     OutputN,
+    #[strum(serialize="N")]
     OutputNumber,
     // Array
+
+    #[strum(serialize="[")]
     GetArrayN,
+    #[strum(serialize="]")]
     PutArrayN,
     // Exit
+    #[strum(serialize=";")]
     Quit
 }
 
@@ -122,62 +166,23 @@ impl Instruction {
     }
 
     pub fn from_char(item: char) -> Option<Self> {
-        match item {
-            '<' => Some(Self::TurnLeft),
-            '>' => Some(Self::TurnRight),
-            '^' => Some(Self::TurnLeftIf),
-            'v' => Some(Self::TurnRightIf),
-            '|' => Some(Self::TurnAround),
-            '(' => Some(Self::Less),
-            ')' => Some(Self::Greater),
-            '=' => Some(Self::Equal),
-            // Stack
-            ':' => Some(Self::Duplicate),
-            '#' => Some(Self::DuplicateTwo),
-            '~' => Some(Self::PopTop),
-            's' => Some(Self::Swap),
-            '{' => Some(Self::RotateLeft),
-            '}' => Some(Self::RotateRight),
-            'd' => Some(Self::DuplicateN),
-            'c' => Some(Self::CopyNth),
-            'u' => Some(Self::UnwrapArray),
-            'a' => Some(Self::WrapArray),
-            // Strings
-            '"' => Some(Self::StartCharacterString),
-            '\'' => Some(Self::StartArrayString),
-            '`' => Some(Self::StartCharacter),
-            // Constants
-            '0' => Some(Self::Const(0)),
-            '1' => Some(Self::Const(1)),
-            '2' => Some(Self::Const(2)),
-            '3' => Some(Self::Const(3)),
-            '4' => Some(Self::Const(4)),
-            '5' => Some(Self::Const(5)),
-            '6' => Some(Self::Const(6)),
-            '7' => Some(Self::Const(7)),
-            '8' => Some(Self::Const(8)),
-            '9' => Some(Self::Const(9)),
-            // Math
-            '+' => Some(Self::Add),
-            '-' => Some(Self::Subtract),
-            '*' => Some(Self::Multiply),
-            '/' => Some(Self::Divide),
-            '_' => Some(Self::Negate),
-            // Input
-            'i' => Some(Self::InputCharacter),
-            'w' => Some(Self::InputWord),
-            'l' => Some(Self::InputLine),
-            'n' => Some(Self::InputNumber),
-            // Output
-            'I' => Some(Self::OutputCharacter),
-            'W' => Some(Self::OutputN),
-            'N' => Some(Self::OutputNumber),
-            // Arrays
-            '[' => Some(Self::GetArrayN),
-            ']' => Some(Self::PutArrayN),
-            // Stop
-            ';' => Some(Self::Quit),
-            _ => None,
+        let mut tmp = [0u8; 4];
+        let string = item.encode_utf8(&mut tmp);
+        match string.parse() {
+            Ok(k) => Some(k),
+            Err(_) => match item {
+                '0' => Some(Self::Const(0)),
+                '1' => Some(Self::Const(1)),
+                '2' => Some(Self::Const(2)),
+                '3' => Some(Self::Const(3)),
+                '4' => Some(Self::Const(4)),
+                '5' => Some(Self::Const(5)),
+                '6' => Some(Self::Const(6)),
+                '7' => Some(Self::Const(7)),
+                '8' => Some(Self::Const(8)),
+                '9' => Some(Self::Const(9)),
+                _ => None
+            }
         }
     }
 
