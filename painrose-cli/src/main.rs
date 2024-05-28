@@ -11,6 +11,6 @@ fn main() {
     program.draw().unwrap();
 
     while program.is_running() {
-        program.step(|c| print!("{}", char::try_from(c as u32).unwrap_or('?')));
+        program.step(&mut std::io::stdout());
     }
 }

@@ -3,7 +3,7 @@ mod error;
 mod instructions;
 mod stack_item;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, io::Write};
 use std::str::FromStr;
 use strum::VariantArray;
 
@@ -36,7 +36,7 @@ where
     T::Edge: FollowableDirection,
 {
     #[allow(unused)]
-    pub fn step<OutFn: Fn(f64)->()>(&mut self, out_fn: OutFn) {
+    pub fn step<Out: Write>(&mut self, out: &mut Out) {
         let instuction = self.code.get(&self.instruction_pointer);
 
         let get_instruction_char_or_default =
@@ -45,7 +45,7 @@ where
         let behavior = match &mut self.mode {
             Mode::NormalMode => {
                 if let Some((ch, Some(instruction))) = instuction {
-                    instruction.evaluate(&mut self.mode, &mut self.stack, &out_fn)
+                    instruction.evaluate(&mut self.mode, &mut self.stack, out)
                 } else {
                     InstructionPointerBehavior::Straight
                 }

@@ -14,18 +14,16 @@ impl StackItem {
         }
     }
 
-    pub fn for_each_recusrive<T: Fn(f64)->()>(&self, operator: &T) {
+    pub(crate)  fn for_each_recusrive<T: FnMut(f64) -> ()>(&self, operator: &mut T) {
         match self {
             StackItem::Number(a) => operator(*a),
-            StackItem::Array(arr) => 
-                arr.iter()
-                    .for_each(|k| k.for_each_recusrive(operator)),
+            StackItem::Array(arr) => arr.iter().for_each(|k| k.for_each_recusrive(operator)),
         }
     }
 
-    fn apply_unary_operator<T: Fn(f64) -> f64>(self, operator: &T) -> StackItem {
+    pub(crate) fn apply_unary_operator<V: Into<StackItem>, T: Fn(f64) -> V>(self, operator: &T) -> StackItem {
         match self {
-            StackItem::Number(a) => StackItem::Number(operator(a)),
+            StackItem::Number(a) => operator(a).into(),
             StackItem::Array(arr) => StackItem::Array(
                 arr.into_iter()
                     .map(|k| k.apply_unary_operator(operator))

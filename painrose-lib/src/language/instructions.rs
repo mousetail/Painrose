@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use strum::EnumString;
 
 use super::stack_item::StackItem;
@@ -183,11 +185,11 @@ impl Instruction {
     }
 
     #[allow(unused)]
-    pub fn evaluate<OutFn: Fn(f64)->()>(
+    pub fn evaluate<Out: Write>(
         self,
         mode: &mut Mode,
         stack: &mut Vec<StackItem>,
-        out_fn: &OutFn
+        out: &mut Out,
     ) -> InstructionPointerBehavior {
         let mut behavior = InstructionPointerBehavior::Straight;
         match self {
@@ -299,12 +301,47 @@ impl Instruction {
             Instruction::InputNumber => todo!(),
             Instruction::OutputCharacter => {
                 let top = top_of_stack_or_default(stack);
-                top.for_each_recusrive(out_fn)
+                top.for_each_recusrive(&mut |k|write!(out, "{}", (k as u32).try_into().unwrap_or('?')).unwrap())
+            }
+            Instruction::OutputN => {
+                let n = top_of_stack_or_default(stack);
+
+                n.for_each_recusrive(&mut |k|{
+                    let n=k as usize;
+                    for _ in 0..n {
+                        let top = top_of_stack_or_default(stack);
+                        top.for_each_recusrive(&mut |k|writeln!(out, "{}", (k as u32).try_into().unwrap_or('?')).unwrap())
+                    }
+                })
             },
-            Instruction::OutputN => todo!(),
-            Instruction::OutputNumber => todo!(),
-            Instruction::GetArrayN => todo!(),
-            Instruction::PutArrayN => todo!(),
+            Instruction::OutputNumber => {
+                let top = top_of_stack_or_default(stack);
+                top.for_each_recusrive(&mut |k|write!(out, "{} ", k).unwrap())
+            },
+            Instruction::GetArrayN => {
+                let n = top_of_stack_or_default(stack);
+                let array = top_of_stack_or_default(stack);
+
+                match array {
+                    StackItem::Number(n) => (),
+                    StackItem::Array(arr) => {
+                        stack.push(n.apply_unary_operator(&|k|arr[k as usize].clone()));
+                    }
+                }
+            },
+            Instruction::PutArrayN => {
+                let value = top_of_stack_or_default(stack);
+                let n = top_of_stack_or_default(stack);
+                let array = top_of_stack_or_default(stack);
+
+                match array {
+                    StackItem::Number(n) => (),
+                    StackItem::Array(mut arr) => {
+                        n.for_each_recusrive(&mut |k|arr[k as usize] = value.clone());
+                        stack.push(StackItem::Array(arr));
+                    }
+                }
+            },
 
             Instruction::Quit => *mode = Mode::Stopped,
         }
