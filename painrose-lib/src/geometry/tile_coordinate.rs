@@ -1,4 +1,3 @@
-
 use super::tiling::{EdgeDefinitionType, RelativeDirection, Tiling};
 use std::str::FromStr;
 use strum::VariantArray;
@@ -12,13 +11,13 @@ pub struct CoordinateTraversalError<T> {
 #[derive(Copy, Clone, PartialEq, Debug, Hash)]
 pub struct CoordinateParsingError<T> {
     index: usize,
-    kind: CoordinateParsingErrorKind<T>
+    kind: CoordinateParsingErrorKind<T>,
 }
 
 #[derive(Copy, Clone, PartialEq, Debug, Hash)]
 enum CoordinateParsingErrorKind<T> {
     TraversalError(CoordinateTraversalError<T>),
-    ParseError(char)
+    ParseError(char),
 }
 
 pub struct TileCoordinate<T: Tiling>(Vec<T::Tile>);
@@ -50,17 +49,27 @@ impl<T: Tiling> std::hash::Hash for TileCoordinate<T> {
 }
 
 impl<T: Tiling> FromStr for TileCoordinate<T>
-    where T::Tile: TryFrom<char, Error = char> {
+where
+    T::Tile: TryFrom<char, Error = char>,
+{
     type Err = CoordinateParsingError<T::Tile>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        return TileCoordinate::new(s.chars().enumerate().map(|(index, c)|T::Tile::try_from(c).map_err(|c|CoordinateParsingError{
-                index,
-                kind: CoordinateParsingErrorKind::ParseError(c)
-            })).collect::<Result<Vec<_>, CoordinateParsingError<T::Tile>>>()?).map_err(|e|CoordinateParsingError {
-                index: 0,
-                kind: CoordinateParsingErrorKind::TraversalError(e)
-            })
+        return TileCoordinate::new(
+            s.chars()
+                .enumerate()
+                .map(|(index, c)| {
+                    T::Tile::try_from(c).map_err(|c| CoordinateParsingError {
+                        index,
+                        kind: CoordinateParsingErrorKind::ParseError(c),
+                    })
+                })
+                .collect::<Result<Vec<_>, CoordinateParsingError<T::Tile>>>()?,
+        )
+        .map_err(|e| CoordinateParsingError {
+            index: 0,
+            kind: CoordinateParsingErrorKind::TraversalError(e),
+        });
     }
 }
 
@@ -175,7 +184,10 @@ impl<T: Tiling> TileCoordinate<T> {
                 }
 
                 let item = *(copy.as_slice().get(index).unwrap());
-                let option_index = <T as Tiling>::Tile::VARIANTS.into_iter().position(|k|*k==item).unwrap();
+                let option_index = <T as Tiling>::Tile::VARIANTS
+                    .into_iter()
+                    .position(|k| *k == item)
+                    .unwrap();
                 if option_index < options.len() - 1 {
                     copy[index] = options[option_index + 1];
                     break;

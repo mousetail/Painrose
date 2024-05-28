@@ -1,8 +1,6 @@
 use painrose_lib::geometry::rhomb::*;
 use painrose_lib::geometry::tile_coordinate::{CoordinateTraversalError, TileCoordinate};
-use painrose_lib::geometry::tiling::{
-    EdgeDefinitionType, OutgoingEdgeDefinition, Tiling,
-};
+use painrose_lib::geometry::tiling::{EdgeDefinitionType, OutgoingEdgeDefinition, Tiling};
 
 #[test]
 pub fn test_if_all_relations_are_symetric() {

@@ -2,96 +2,92 @@ use strum::EnumString;
 
 use super::stack_item::StackItem;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-#[derive(EnumString)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, EnumString)]
 pub enum Instruction {
     // Control Flow
-    #[strum(serialize="<")]
+    #[strum(serialize = "<")]
     TurnLeft,
-    #[strum(serialize=">")]
+    #[strum(serialize = ">")]
     TurnRight,
-    #[strum(serialize="^")]
+    #[strum(serialize = "^")]
     TurnLeftIf,
-    #[strum(serialize="v")]
+    #[strum(serialize = "v")]
     TurnRightIf,
-    #[strum(serialize="|")]
+    #[strum(serialize = "|")]
     TurnAround,
-    #[strum(serialize="(")]
+    #[strum(serialize = "(")]
     Less,
-    #[strum(serialize=")")]
+    #[strum(serialize = ")")]
     Greater,
-    #[strum(serialize="=")]
+    #[strum(serialize = "=")]
     Equal,
     // Stack
-
-    #[strum(serialize=":")]
+    #[strum(serialize = ":")]
     Duplicate,
-    #[strum(serialize="#")]
+    #[strum(serialize = "#")]
     DuplicateTwo,
-    #[strum(serialize="~")]
+    #[strum(serialize = "~")]
     PopTop,
-    #[strum(serialize="s")]
+    #[strum(serialize = "s")]
     Swap,
-    #[strum(serialize="{")]
+    #[strum(serialize = "{")]
     RotateLeft,
 
-    #[strum(serialize="}")]
+    #[strum(serialize = "}")]
     RotateRight,
 
-    #[strum(serialize="d")]
+    #[strum(serialize = "d")]
     DuplicateN,
-    #[strum(serialize="c")]
+    #[strum(serialize = "c")]
     CopyNth,
-    #[strum(serialize="u")]
+    #[strum(serialize = "u")]
     UnwrapArray,
-    #[strum(serialize="a")]
+    #[strum(serialize = "a")]
     WrapArray,
     // String
-
-    #[strum(serialize="'")]
+    #[strum(serialize = "'")]
     StartCharacterString,
-    #[strum(serialize="\"")]
+    #[strum(serialize = "\"")]
     StartArrayString,
-    #[strum(serialize="`")]
+    #[strum(serialize = "`")]
     StartCharacter,
     // Constants
     Const(u8),
     // Math
-    #[strum(serialize="+")]
+    #[strum(serialize = "+")]
     Add,
-    #[strum(serialize="-")]
+    #[strum(serialize = "-")]
     Subtract,
-    #[strum(serialize="*")]
+    #[strum(serialize = "*")]
     Multiply,
-    #[strum(serialize="/")]
+    #[strum(serialize = "/")]
     Divide,
-    #[strum(serialize="_")]
+    #[strum(serialize = "_")]
     Negate,
     // Input
-    #[strum(serialize="i")]
+    #[strum(serialize = "i")]
     InputCharacter,
-    #[strum(serialize="w")]
+    #[strum(serialize = "w")]
     InputLine,
-    #[strum(serialize="l")]
+    #[strum(serialize = "l")]
     InputWord,
-    #[strum(serialize="n")]
+    #[strum(serialize = "n")]
     InputNumber,
     // Output
-    #[strum(serialize="I")]
+    #[strum(serialize = "I")]
     OutputCharacter,
-    #[strum(serialize="W")]
+    #[strum(serialize = "W")]
     OutputN,
-    #[strum(serialize="N")]
+    #[strum(serialize = "N")]
     OutputNumber,
     // Array
-
-    #[strum(serialize="[")]
+    #[strum(serialize = "[")]
     GetArrayN,
-    #[strum(serialize="]")]
+    #[strum(serialize = "]")]
     PutArrayN,
     // Exit
-    #[strum(serialize=";")]
-    Quit
+    #[strum(serialize = ";")]
+    Quit,
 }
 
 #[derive(PartialEq, Debug, Copy, Clone)]
@@ -108,7 +104,7 @@ pub enum Mode {
     CharStringMode(Vec<StackItem>),
     ArrayStringMode(Vec<StackItem>),
     CharMode,
-    Stopped
+    Stopped,
 }
 
 fn top_of_stack_or_default(stack: &mut Vec<StackItem>) -> StackItem {
@@ -181,8 +177,8 @@ impl Instruction {
                 '7' => Some(Self::Const(7)),
                 '8' => Some(Self::Const(8)),
                 '9' => Some(Self::Const(9)),
-                _ => None
-            }
+                _ => None,
+            },
         }
     }
 
@@ -295,7 +291,7 @@ impl Instruction {
             Instruction::Negate => {
                 let m = top_of_stack_or_default(stack);
                 stack.push(-m);
-            },
+            }
             Instruction::InputCharacter => todo!(),
             Instruction::InputLine => todo!(),
             Instruction::InputWord => todo!(),
@@ -306,7 +302,7 @@ impl Instruction {
             Instruction::GetArrayN => todo!(),
             Instruction::PutArrayN => todo!(),
 
-            Instruction::Quit => *mode = Mode::Stopped
+            Instruction::Quit => *mode = Mode::Stopped,
         }
         return behavior;
     }

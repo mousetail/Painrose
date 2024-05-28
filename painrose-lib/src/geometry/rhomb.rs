@@ -4,16 +4,13 @@ use crate::language::FollowableDirection;
 
 use super::draw;
 use super::tile_coordinate::CoordinateTraversalError;
-use super::tiling::{
-    EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling,
-};
+use super::tiling::{EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling};
 use std::f32::consts;
 
 const SCALING_FACTOR: f32 = 1.618033988;
 const SCALING_FACTOR_INVERSE: f32 = 1.0 / SCALING_FACTOR;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-#[derive(VariantArray, EnumString)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, VariantArray, EnumString)]
 pub enum AbsoluteDirection {
     #[strum(serialize = "north", serialize = "n", ascii_case_insensitive)]
     North,
@@ -54,8 +51,7 @@ impl FollowableDirection for AbsoluteDirection {
     }
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-#[derive(VariantArray)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, VariantArray)]
 pub enum Tile {
     A,
     B,
@@ -82,7 +78,7 @@ impl TryFrom<char> for Tile {
             'c' => Ok(Tile::C),
             'd' => Ok(Tile::D),
             'e' => Ok(Tile::E),
-            err => Err(err)
+            err => Err(err),
         }
     }
 }

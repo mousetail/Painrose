@@ -18,8 +18,10 @@ impl StackItem {
         match self {
             StackItem::Number(a) => StackItem::Number(-a),
             StackItem::Array(arr) => StackItem::Array(
-                arr.into_iter().map(|k|k.apply_unary_operator(operator)).collect()
-            )
+                arr.into_iter()
+                    .map(|k| k.apply_unary_operator(operator))
+                    .collect(),
+            ),
         }
     }
 
