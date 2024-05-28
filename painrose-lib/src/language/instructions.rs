@@ -183,10 +183,11 @@ impl Instruction {
     }
 
     #[allow(unused)]
-    pub fn evaluate(
+    pub fn evaluate<OutFn: Fn(f64)->()>(
         self,
         mode: &mut Mode,
         stack: &mut Vec<StackItem>,
+        out_fn: &OutFn
     ) -> InstructionPointerBehavior {
         let mut behavior = InstructionPointerBehavior::Straight;
         match self {
@@ -296,7 +297,10 @@ impl Instruction {
             Instruction::InputLine => todo!(),
             Instruction::InputWord => todo!(),
             Instruction::InputNumber => todo!(),
-            Instruction::OutputCharacter => todo!(),
+            Instruction::OutputCharacter => {
+                let top = top_of_stack_or_default(stack);
+                top.for_each_recusrive(out_fn)
+            },
             Instruction::OutputN => todo!(),
             Instruction::OutputNumber => todo!(),
             Instruction::GetArrayN => todo!(),

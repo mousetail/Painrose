@@ -14,9 +14,18 @@ impl StackItem {
         }
     }
 
+    pub fn for_each_recusrive<T: Fn(f64)->()>(&self, operator: &T) {
+        match self {
+            StackItem::Number(a) => operator(*a),
+            StackItem::Array(arr) => 
+                arr.iter()
+                    .for_each(|k| k.for_each_recusrive(operator)),
+        }
+    }
+
     fn apply_unary_operator<T: Fn(f64) -> f64>(self, operator: &T) -> StackItem {
         match self {
-            StackItem::Number(a) => StackItem::Number(-a),
+            StackItem::Number(a) => StackItem::Number(operator(a)),
             StackItem::Array(arr) => StackItem::Array(
                 arr.into_iter()
                     .map(|k| k.apply_unary_operator(operator))

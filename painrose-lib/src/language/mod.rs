@@ -36,9 +36,8 @@ where
     T::Edge: FollowableDirection,
 {
     #[allow(unused)]
-    pub fn step(&mut self) {
+    pub fn step<OutFn: Fn(f64)->()>(&mut self, out_fn: OutFn) {
         let instuction = self.code.get(&self.instruction_pointer);
-        println!("{instuction:?} {:?}", self.mode);
 
         let get_instruction_char_or_default =
             || stack_item::StackItem::Number(instuction.map(|t| t.0 as u32 as f64).unwrap_or(0.0));
@@ -46,7 +45,7 @@ where
         let behavior = match &mut self.mode {
             Mode::NormalMode => {
                 if let Some((ch, Some(instruction))) = instuction {
-                    instruction.evaluate(&mut self.mode, &mut self.stack)
+                    instruction.evaluate(&mut self.mode, &mut self.stack, &out_fn)
                 } else {
                     InstructionPointerBehavior::Straight
                 }

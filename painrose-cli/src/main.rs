@@ -10,12 +10,7 @@ fn main() {
 
     program.draw().unwrap();
 
-    let mut i = 0;
     while program.is_running() {
-        program.step();
-        i += 1;
-        if i > 100 {
-            break;
-        }
+        program.step(|c| print!("{}", char::try_from(c as u32).unwrap_or('?')));
     }
 }
