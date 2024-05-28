@@ -1,5 +1,4 @@
-pub mod geometry;
-pub mod language;
+use painrose_lib::{geometry, language};
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();

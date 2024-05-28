@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    "painrose-cli",
     'painrose-lib'
 ]
 resolver = "2"
