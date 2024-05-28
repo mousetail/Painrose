@@ -3,8 +3,8 @@ mod error;
 mod instructions;
 mod stack_item;
 
-use std::{collections::HashMap, io::Write};
 use std::str::FromStr;
+use std::{collections::HashMap, io::Write};
 use strum::VariantArray;
 
 use crate::geometry::draw::DrawableTile;
