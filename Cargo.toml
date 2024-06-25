@@ -2,6 +2,7 @@
 
 members = [
     "painrose-cli",
-    'painrose-lib'
-]
+    'painrose-lib',
+    "painrose-wasm",
+    "xtask"]
 resolver = "2"

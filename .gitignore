@@ -1,2 +1,5 @@
 /target
 Tiles.svg
+.idea
+.vscode
+js-build
