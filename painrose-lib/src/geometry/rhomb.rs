@@ -5,8 +5,6 @@ use crate::language::FollowableDirection;
 use super::draw;
 use super::tile_coordinate::CoordinateTraversalError;
 use super::tiling::{EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling};
-use std::borrow::Borrow;
-use std::cell::{Cell, OnceCell};
 use std::f32::consts;
 
 const SCALING_FACTOR: f32 = 1.618033988;
