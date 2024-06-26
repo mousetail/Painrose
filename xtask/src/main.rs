@@ -102,10 +102,11 @@ fn main() -> Result<(), Error> {
 
                 std::fs::copy("painrose-wasm/index.html", "js-build/index.html")?;
 
-                assert_success(Command::new("python3").args([
-                    "-m",
-                    "http.server",
-                ]).current_dir("js-build"))?;
+                assert_success(
+                    Command::new("python3")
+                        .args(["-m", "http.server"])
+                        .current_dir("js-build"),
+                )?;
             }
             _ => todo!(),
         },

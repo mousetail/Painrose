@@ -7,49 +7,48 @@ use super::stack_item::StackItem;
 #[derive(Copy, Clone, PartialEq, Eq, Debug, EnumString)]
 pub enum Instruction {
     // Control Flow
-    #[strum(serialize = "<")]
+    #[strum(serialize = "<")] // ↶
     TurnLeft,
-    #[strum(serialize = ">")]
+    #[strum(serialize = ">")] // ↷
     TurnRight,
-    #[strum(serialize = "^")]
+    #[strum(serialize = "^")] // ↰
     TurnLeftIf,
-    #[strum(serialize = "v")]
+    #[strum(serialize = "v")] // ↱
     TurnRightIf,
-    #[strum(serialize = "|")]
+    #[strum(serialize = "|")] // ⇋
     TurnAround,
-    #[strum(serialize = "(")]
+    #[strum(serialize = "(")] // ⪇
     Less,
-    #[strum(serialize = ")")]
+    #[strum(serialize = ")")] // ⪈
     Greater,
-    #[strum(serialize = "=")]
+    #[strum(serialize = "=")] // =
     Equal,
     // Stack
-    #[strum(serialize = ":")]
+    #[strum(serialize = ":")] // :
     Duplicate,
-    #[strum(serialize = "#")]
+    #[strum(serialize = "#")] // ∴
     DuplicateTwo,
-    #[strum(serialize = "~")]
+    #[strum(serialize = "~")] // 🗑
     PopTop,
-    #[strum(serialize = "s")]
+    #[strum(serialize = "s")] // ⨬
     Swap,
-    #[strum(serialize = "{")]
+    #[strum(serialize = "{")] // 🨋
     RotateLeft,
-
-    #[strum(serialize = "}")]
+    #[strum(serialize = "}")] // 🨻
     RotateRight,
 
-    #[strum(serialize = "d")]
+    #[strum(serialize = "d")] // ⁘
     DuplicateN,
-    #[strum(serialize = "c")]
+    #[strum(serialize = "c")] // ©
     CopyNth,
-    #[strum(serialize = "u")]
+    #[strum(serialize = "u")] // ♼
     UnwrapArray,
-    #[strum(serialize = "a")]
+    #[strum(serialize = "a")] // ☒
     WrapArray,
     // String
-    #[strum(serialize = "'")]
+    #[strum(serialize = "'")] // '
     StartCharacterString,
-    #[strum(serialize = "\"")]
+    #[strum(serialize = "\"")] //
     StartArrayString,
     #[strum(serialize = "`")]
     StartCharacter,

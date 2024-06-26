@@ -7,7 +7,7 @@ use std::str::FromStr;
 use std::{collections::HashMap, io::Write};
 use strum::VariantArray;
 
-use crate::geometry::draw::DrawableTile;
+use crate::geometry::draw::{DrawableTile, ShapeInfo};
 use crate::geometry::tile_coordinate::TileCoordinate;
 use crate::geometry::tiling::Tiling;
 
@@ -170,5 +170,9 @@ where
     #[allow(unused)]
     pub fn draw(&self) -> std::io::Result<()> {
         super::language::draw::draw(self)
+    }
+
+    pub fn get_shapes(&self) -> Vec<ShapeInfo> {
+        super::language::draw::get_shapes(self)
     }
 }

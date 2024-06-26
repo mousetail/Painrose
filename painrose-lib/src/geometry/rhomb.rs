@@ -5,6 +5,8 @@ use crate::language::FollowableDirection;
 use super::draw;
 use super::tile_coordinate::CoordinateTraversalError;
 use super::tiling::{EdgeDefinitionType, OutgoingEdgeDefinition, RelativeDirection, Tiling};
+use std::borrow::Borrow;
+use std::cell::{Cell, OnceCell};
 use std::f32::consts;
 
 const SCALING_FACTOR: f32 = 1.618033988;
@@ -83,6 +85,10 @@ impl TryFrom<char> for Tile {
     }
 }
 
+thread_local! {
+    static RHOMB_SHAPE_INFO: AllShapeInfos = AllShapeInfos::default();
+}
+
 impl ShapeInfo {
     fn new(angle: f32) -> ShapeInfo {
         let angle_radians = angle.to_radians();
@@ -106,8 +112,8 @@ pub struct AllShapeInfos {
     thick_rhomb: ShapeInfo,
 }
 
-impl draw::DrawableTileCachedData for AllShapeInfos {
-    fn new() -> AllShapeInfos {
+impl Default for AllShapeInfos {
+    fn default() -> Self {
         AllShapeInfos {
             thin_rhomb: ShapeInfo::new(36.0),
             thick_rhomb: ShapeInfo::new(108.0),
@@ -117,9 +123,10 @@ impl draw::DrawableTileCachedData for AllShapeInfos {
 
 impl draw::DrawableTile for Tile {
     const SCALING_FACTOR: f32 = SCALING_FACTOR;
-    type Data = AllShapeInfos;
 
-    fn get_coordinate(self, shape_info: AllShapeInfos) -> (glam::Vec2, f32) {
+    fn get_coordinate(self) -> (glam::Vec2, f32) {
+        let shape_info = RHOMB_SHAPE_INFO.with(|t| *t);
+
         use glam::Vec2;
         match self {
             Tile::A => (
@@ -176,7 +183,8 @@ impl draw::DrawableTile for Tile {
         }
     }
 
-    fn get_shape(self, shape_info: AllShapeInfos) -> Vec<glam::Vec2> {
+    fn get_shape(self) -> Vec<glam::Vec2> {
+        let shape_info = RHOMB_SHAPE_INFO.with(|t| *t);
         use glam::Vec2;
 
         let rhomb = match self {
@@ -205,11 +213,11 @@ impl draw::DrawableTile for Tile {
 
     fn get_color(self) -> &'static str {
         match self {
-            Tile::A => "red",
-            Tile::B => "green",
-            Tile::C => "blue",
-            Tile::D => "magenta",
-            Tile::E => "orange",
+            Tile::A => "#F4E8C1",
+            Tile::B => "#A0C1B9",
+            Tile::C => "#70A0AF",
+            Tile::D => "#706993",
+            Tile::E => "#331E38",
         }
     }
 }
