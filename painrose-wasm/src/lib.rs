@@ -1,12 +1,62 @@
-use painrose_lib::{geometry, language};
+use tokio::sync::mpsc;
+
+use painrose_lib::{
+    geometry::{self, draw::DrawableTile, rhomb::Tile, tiling::Tiling},
+    language::{self, FollowableDirection},
+};
 use wasm_bindgen::prelude::*;
 #[macro_use]
 mod macros;
+mod layout;
+mod renderer;
+
+use layout::Layout;
+use web_sys::Window;
 
 const SVG_NAMESPACE: &'static str = "http://www.w3.org/2000/svg";
 
+struct DivOutput<'a> {
+    div: &'a web_sys::Element,
+}
+
+impl<'a> std::io::Write for DivOutput<'a> {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.div
+            .append_with_str_1(&String::from_utf8_lossy(buf))
+            .map_err(|e| {
+                std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    e.as_string().unwrap_or(format!("Error")),
+                )
+            })?;
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+
+enum Message {
+    ProgramStep,
+}
+
+fn start_timer(sender: mpsc::Sender<Message>, window: &Window) -> Result<(), JsValue> {
+    let callback: Closure<dyn Fn()> = Closure::new(move || {
+        sender.blocking_send(Message::ProgramStep).unwrap();
+    });
+
+    window.set_interval_with_callback_and_timeout_and_arguments_0(
+        callback.as_ref().unchecked_ref(),
+        500,
+    )?;
+    callback.forget();
+
+    return Ok(());
+}
+
 #[wasm_bindgen(start)]
-fn main() -> Result<(), JsValue> {
+async fn main() -> Result<(), JsValue> {
     // Use `web_sys`'s global `window` function to get a handle on the global
     // window object.
     let window = web_sys::window().expect("no global `window` exists");
@@ -16,56 +66,24 @@ fn main() -> Result<(), JsValue> {
     let code = ":\"Hello World!\"I;
 a-e:\"Goodbye All?\"C;";
 
-    let program =
+    let mut program =
         language::LanguageState::<geometry::rhomb::RhombTiling>::new_from_string(code.to_string())
             .unwrap();
 
-    // Manufacture the element we're gonna append
-    let val = document.create_element("p")?;
-    val.set_text_content(Some("Hello!! from Rust!"));
+    let layout = Layout::new(&document)?;
 
-    let svg = svg_element!(
-        document,
-        "svg",
-        {
-            "viewBox" => "-5 -5 10 10",
-            "width" => "800",
-            "height" => "800",
+    let (sender, mut receiver) = mpsc::channel::<Message>(24);
+
+    start_timer(sender.clone(), &window)?;
+
+    while let Some(message) = receiver.recv().await {
+        match message {
+            Message::ProgramStep => {
+                program.step(&mut layout.get_output(), &mut std::io::Cursor::new("Help!"));
+                layout.update(&program)?;
+            }
         }
-    );
-    for shape in program.get_shapes() {
-        let path = svg_element!(
-            document,
-            "path",
-            {
-                "d" => &shape.get_outline_d(),
-                "fill" => shape.fill.unwrap_or("none"),
-                "stroke" =>shape.stroke.unwrap_or("none"),
-                "stroke-width" => &format!("{}", shape.stroke_width),
-            }
-        );
-
-        svg.append_child(&path)?;
-
-        let text = svg_element!(
-            document,
-            "text",
-            {
-                "x" => &format!("{}", shape.center.x),
-                "y" => &format!("{}", shape.center.y),
-                "font-size" => "0.5",
-                "font-family" => "sans-serif",
-                "fill" => shape.text_color,
-                "text-anchor" => "middle",
-                "dominant-baseline" => "middle",
-            }
-        );
-        text.set_text_content(Some(&shape.label));
-        svg.append_child(&text)?;
     }
-    body.append_child(&svg)?;
-
-    body.append_child(&val)?;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::{Read, Write};
 
 use strum::EnumString;
 
@@ -184,11 +184,12 @@ impl Instruction {
     }
 
     #[allow(unused)]
-    pub fn evaluate<Out: Write>(
+    pub fn evaluate<Out: Write, In: Read>(
         self,
         mode: &mut Mode,
         stack: &mut Vec<StackItem>,
         out: &mut Out,
+        input: &mut In,
     ) -> InstructionPointerBehavior {
         let mut behavior = InstructionPointerBehavior::Straight;
         match self {

@@ -1,6 +1,8 @@
 use strum::VariantArray;
 
-use super::tile_coordinate::CoordinateTraversalError;
+use crate::language::FollowableDirection;
+
+use super::{draw::DrawableTile, tile_coordinate::CoordinateTraversalError};
 
 #[derive(Debug, PartialEq)]
 pub enum EdgeDefinitionType<Tile, Edge> {
@@ -52,3 +54,16 @@ pub trait Tiling {
         outside_tile: Self::Tile,
     ) -> Result<(), CoordinateTraversalError<Self::Tile>>;
 }
+
+// TODO: Replace this with a trait alias when https://github.com/rust-lang/rust/issues/41517 is stabilized
+pub trait DrawableTiling: Tiling<Tile: DrawableTile> {}
+
+impl<T: Tiling> DrawableTiling for T where <T as Tiling>::Tile: DrawableTile {}
+
+pub trait ExecutableTiling: Tiling<Edge: FollowableDirection>
+where
+    <Self as Tiling>::Edge: FollowableDirection,
+{
+}
+
+impl<T: Tiling> ExecutableTiling for T where <T as Tiling>::Edge: FollowableDirection {}

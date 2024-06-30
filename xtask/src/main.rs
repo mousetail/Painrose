@@ -1,7 +1,4 @@
-use std::{
-    fmt::Debug,
-    process::{Command},
-};
+use std::{fmt::Debug, process::Command};
 
 use clap::{Parser, Subcommand, ValueEnum};
 
@@ -101,6 +98,7 @@ fn main() -> Result<(), Error> {
                 ]))?;
 
                 std::fs::copy("painrose-wasm/index.html", "js-build/index.html")?;
+                std::fs::copy("painrose-wasm/style.css", "js-build/style.css")?;
 
                 assert_success(
                     Command::new("python3")

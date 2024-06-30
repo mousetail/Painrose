@@ -11,6 +11,6 @@ fn main() {
     program.draw().unwrap();
 
     while program.is_running() {
-        program.step(&mut std::io::stdout());
+        program.step(&mut std::io::stdout(), &mut std::io::stdin());
     }
 }
